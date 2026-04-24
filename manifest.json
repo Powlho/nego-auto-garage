@@ -1,0 +1,13 @@
+{
+  "name": "NégoAuto — Garage",
+  "short_name": "NégoAuto",
+  "description": "Comparateur VE occasion · Garage",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080810",
+  "theme_color": "#00e5a0",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

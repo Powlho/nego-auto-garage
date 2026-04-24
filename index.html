@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NégoAuto — Garage</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00e5a0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NégoAuto">
+<link rel="apple-touch-icon" href="/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --surface: #0f0f1a;
+  --card: #15151f;
+  --card2: #1c1c28;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #00e5a0;
+  --accent-dim: rgba(0,229,160,0.12);
+  --warn: #ffb800;
+  --warn-dim: rgba(255,184,0,0.1);
+  --bad: #ff4d6d;
+  --bad-dim: rgba(255,77,109,0.1);
+  --text: #eeeef5;
+  --muted: rgba(238,238,245,0.4);
+  --muted2: rgba(238,238,245,0.6);
+  --mono: 'DM Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.app { max-width: 520px; margin: 0 auto; padding: 0 16px 60px; }
+
+header {
+  padding: 24px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.logo { font-family: var(--display); font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+.logo em { color: var(--accent); font-style: normal; }
+.tagline { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 3px; }
+
+.section { margin-bottom: 24px; }
+.section-label {
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.input-group { margin-bottom: 14px; }
+.input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  color: var(--muted2);
+  margin-bottom: 6px;
+}
+.input-hint { font-size: 10px; color: var(--muted); font-style: italic; }
+.input-row { display: flex; gap: 8px; align-items: center; }
+.unit { font-size: 12px; color: var(--muted2); white-space: nowrap; }
+
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 10px 12px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+select:focus, input:focus { border-color: var(--accent); }
+input[type="number"] { flex: 1; }
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(238,238,245,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 6px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--muted2);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.seg-btn:hover { border-color: rgba(0,229,160,0.3); color: var(--text); }
+.seg-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #080810;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { opacity: 0.7; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--muted2);
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* LOADING */
+.loading {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+.loading.show { display: flex; }
+.loading-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin: 0 4px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,80%,100%{opacity:0.2;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+/* RAPPORT */
+#rapport { display: none; }
+#rapport.show { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── VERDICT BANNER ── */
+.verdict-banner {
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid;
+}
+.verdict-banner.ok { background: var(--accent-dim); border-color: rgba(0,229,160,0.25); }
+.verdict-banner.warn { background: var(--warn-dim); border-color: rgba(255,184,0,0.25); }
+.verdict-banner.bad { background: var(--bad-dim); border-color: rgba(255,77,109,0.25); }
+.verdict-emoji { font-size: 28px; margin-bottom: 8px; }
+.verdict-title { font-family: var(--display); font-size: 20px; font-weight: 900; }
+.verdict-sub { font-size: 12px; color: var(--muted2); margin-top: 4px; }
+
+/* ── LA CENTRALE HERO ── */
+.lc-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.lc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+.lc-proposed { flex: 1; }
+.lc-proposed-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.lc-proposed-price { font-family: var(--display); font-size: 28px; font-weight: 900; }
+.lc-market { flex: 1; text-align: right; }
+.lc-market-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.lc-market-range { font-size: 13px; color: var(--muted2); }
+.lc-market-cible { font-size: 16px; font-weight: 500; margin-top: 2px; }
+
+/* Price gauge */
+.gauge-wrap { position: relative; margin: 8px 0 32px; }
+.gauge-track {
+  height: 8px;
+  background: var(--border2);
+  border-radius: 4px;
+  position: relative;
+  overflow: visible;
+}
+.gauge-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 4px;
+}
+.gauge-dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--bg);
+  z-index: 2;
+}
+.gauge-dot.prix { width: 18px; height: 18px; z-index: 3; }
+.gauge-lbl {
+  position: absolute;
+  top: 14px;
+  font-size: 10px;
+  color: var(--muted);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.gauge-lbl.prix { color: var(--text); font-weight: 500; font-size: 11px; }
+
+.lc-gap {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: 1px solid;
+}
+.lc-gap.ok { color: var(--accent); background: var(--accent-dim); border-color: rgba(0,229,160,0.2); }
+.lc-gap.warn { color: var(--warn); background: var(--warn-dim); border-color: rgba(255,184,0,0.2); }
+.lc-gap.bad { color: var(--bad); background: var(--bad-dim); border-color: rgba(255,77,109,0.2); }
+
+.btn-lc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px;
+  background: #e8380d;
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.btn-lc:hover { opacity: 0.88; }
+.btn-lc svg { flex-shrink: 0; }
+
+/* ── STAT CARDS ── */
+.stats-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.stat-card {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.stat-card-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.stat-card-value { font-family: var(--display); font-size: 20px; font-weight: 800; }
+.stat-card-value.ok { color: var(--accent); }
+.stat-card-value.warn { color: var(--warn); }
+.stat-card-value.bad { color: var(--bad); }
+.stat-card-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+/* ── SPEC CARD ── */
+.spec-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+.spec-item-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.spec-item-value { font-size: 13px; color: var(--text); margin-top: 2px; }
+
+/* ── DÉFAUTS ── */
+.defaut-card {
+  background: var(--card);
+  border-left: 3px solid;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.defaut-card.critique { border-color: var(--bad); }
+.defaut-card.élevé { border-color: var(--warn); }
+.defaut-card.moyen { border-color: #8888ff; }
+.defaut-card.faible { border-color: var(--border2); }
+.defaut-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+.defaut-badge.critique { background: var(--bad-dim); color: var(--bad); }
+.defaut-badge.élevé { background: var(--warn-dim); color: var(--warn); }
+.defaut-badge.moyen { background: rgba(136,136,255,0.1); color: #8888ff; }
+.defaut-badge.faible { background: var(--border); color: var(--muted2); }
+.defaut-titre { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.defaut-detail { font-size: 12px; color: var(--muted2); line-height: 1.5; }
+
+/* RAPPEL CRITIQUE */
+.rappel-banner {
+  background: var(--bad-dim);
+  border: 1px solid var(--bad);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+.rappel-banner strong { color: var(--bad); display: block; margin-bottom: 4px; font-size: 13px; }
+
+/* ── NEGO SCRIPTS ── */
+.nego-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 8px;
+}
+.nego-axe { font-size: 11px; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.nego-script {
+  font-size: 13px;
+  color: var(--muted2);
+  font-style: italic;
+  line-height: 1.6;
+  cursor: pointer;
+  border-left: 2px solid var(--border2);
+  padding-left: 10px;
+  transition: color 0.2s;
+}
+.nego-script:hover { color: var(--text); border-color: var(--accent); }
+.nego-copy-hint { font-size: 10px; color: var(--muted); margin-top: 6px; }
+
+/* ── ARGS (pros/cons) ── */
+.arg-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.arg-item:last-child { border-bottom: none; }
+.arg-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.arg-icon.positive { color: var(--accent); }
+.arg-icon.warning { color: var(--warn); }
+.arg-icon.negative { color: var(--bad); }
+.arg-text { color: var(--muted2); }
+
+/* ── VIGILANCES ── */
+.vig-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  background: var(--card);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.vig-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.vig-dot.high { background: var(--bad); }
+.vig-dot.med { background: var(--warn); }
+.vig-dot.low { background: var(--border2); }
+.vig-title { font-weight: 500; color: var(--text); }
+.vig-detail { color: var(--muted2); margin-top: 2px; }
+
+/* ── CHECKS ── */
+.check-list { list-style: none; padding: 0; }
+.check-list li {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted2);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.check-list li:last-child { border-bottom: none; }
+.check-list li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+
+/* ── SECTION LABELS IN REPORT ── */
+.r-label {
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 24px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.r-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* COPY TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--card2);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 12px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  transition: transform 0.25s ease;
+  z-index: 100;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo">NÉGO<em>AUTO</em></div>
+    <div class="tagline">GARAGE · VE OCCASION · FRANCE 2026</div>
+  </header>
+
+  <!-- FORM -->
+  <div id="formSection">
+    <div class="section">
+      <div class="section-label">Véhicule proposé</div>
+
+      <div class="input-group">
+        <div class="input-label">Modèle <span class="input-hint">Sélectionnez dans la liste</span></div>
+        <select id="modele" onchange="onModeleChange()">
+          <optgroup label="── Compactes / Berlines ──">
+            <option value="megane60">Renault Mégane E-Tech 60 kWh</option>
+            <option value="megane40">Renault Mégane E-Tech 40 kWh</option>
+            <option value="id3_58">VW ID.3 58 kWh (2023+)</option>
+            <option value="id3_77">VW ID.3 77 kWh (2023+)</option>
+            <option value="born_58">Cupra Born 58 kWh</option>
+            <option value="born_77">Cupra Born 77 kWh</option>
+            <option value="mg4_49">MG4 49 kWh Standard</option>
+            <option value="mg4_64">MG4 64 kWh Extended</option>
+            <option value="mg4_77">MG4 77 kWh Trophy</option>
+            <option value="e308">Peugeot e-308</option>
+            <option value="astra_e">Opel Astra Electric</option>
+            <option value="ec4">Citroën ë-C4 54 kWh</option>
+            <option value="model3_sr">Tesla Model 3 Standard Range</option>
+            <option value="model3_lr">Tesla Model 3 Grande Autonomie</option>
+            <option value="model3_perf">Tesla Model 3 Performance</option>
+          </optgroup>
+          <optgroup label="── Berlines premium ──">
+            <option value="i4_40">BMW i4 eDrive40</option>
+            <option value="ioniq6_53">Hyundai Ioniq 6 53 kWh</option>
+            <option value="ioniq6_77">Hyundai Ioniq 6 77 kWh</option>
+            <option value="id7">VW ID.7 77 kWh</option>
+          </optgroup>
+          <optgroup label="── Citadines ──">
+            <option value="inster_42">Hyundai Inster 42 kWh</option>
+            <option value="inster_49">Hyundai Inster 49 kWh LR</option>
+            <option value="r5_40">Renault R5 E-Tech 40 kWh</option>
+            <option value="r5_52">Renault R5 E-Tech 52 kWh</option>
+            <option value="e208_50">Peugeot e-208 50 kWh</option>
+            <option value="leaf_40">Nissan Leaf 40 kWh</option>
+            <option value="zoe_52">Renault Zoé ZE50</option>
+            <option value="spring">Dacia Spring</option>
+          </optgroup>
+          <optgroup label="── Autre ──">
+            <option value="autre">Autre modèle</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div id="autreNomGroup" style="display:none" class="input-group">
+        <div class="input-label">Nom du modèle</div>
+        <input type="text" id="autreNom" placeholder="Ex: BYD Dolphin, Kia EV3...">
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Prix demandé <span class="input-hint">TTC, tel qu'affiché</span></div>
+        <div class="input-row">
+          <input type="number" id="prix" placeholder="23000" min="3000" max="120000" inputmode="numeric">
+          <span class="unit">€</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Kilométrage</div>
+        <div class="input-row">
+          <input type="number" id="km" placeholder="45000" min="0" max="400000" inputmode="numeric">
+          <span class="unit">km</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Année de mise en circulation</div>
+        <div class="seg">
+          <button class="seg-btn" onclick="setAnnee(2021,this)">2021</button>
+          <button class="seg-btn" onclick="setAnnee(2022,this)">2022</button>
+          <button class="seg-btn active" onclick="setAnnee(2023,this)">2023</button>
+          <button class="seg-btn" onclick="setAnnee(2024,this)">2024</button>
+          <button class="seg-btn" onclick="setAnnee(2025,this)">2025</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Type de vendeur</div>
+        <div class="seg">
+          <button class="seg-btn active" onclick="setSeg('vendeur','pro',this)">Pro</button>
+          <button class="seg-btn" onclick="setSeg('vendeur','certifie',this)">Certifié</button>
+          <button class="seg-btn" onclick="setSeg('vendeur','particulier',this)">Particulier</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-label">Garantie proposée</div>
+        <div class="seg">
+          <button class="seg-btn" onclick="setSeg('garantie',0,this)">Aucune</button>
+          <button class="seg-btn active" onclick="setSeg('garantie',6,this)">6 mois</button>
+          <button class="seg-btn" onclick="setSeg('garantie',12,this)">12 mois+</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="analyser()">ANALYSER →</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" id="loading">
+    <div style="margin-bottom:16px">
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+    </div>
+    Comparaison en cours…
+  </div>
+
+  <!-- RAPPORT -->
+  <div id="rapport"></div>
+
+</div><!-- /app -->
+
+<div class="toast" id="toast">Phrase copiée ✓</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DONNÉES MARCHÉ (prix occasion France, avril 2026)
+// ─────────────────────────────────────────────
+const MODELS = {
+  megane60:   { label:'Renault Mégane E-Tech 60 kWh', min:19000, max:27000, cible:22500, bat:60, range:320, charge_max:130, fiabilite:'bonne', cat:'compacte', longueur:'4.21m', coffre:'440L' },
+  megane40:   { label:'Renault Mégane E-Tech 40 kWh', min:15000, max:21000, cible:17500, bat:40, range:215, charge_max:130, fiabilite:'bonne', cat:'compacte', longueur:'4.21m', coffre:'440L' },
+  id3_58:     { label:'VW ID.3 58 kWh (2023+)', min:21000, max:30000, cible:25000, bat:58, range:330, charge_max:170, fiabilite:'bonne', cat:'compacte', longueur:'4.26m', coffre:'385L' },
+  id3_77:     { label:'VW ID.3 77 kWh (2023+)', min:25000, max:35000, cible:29000, bat:77, range:430, charge_max:170, fiabilite:'bonne', cat:'compacte', longueur:'4.26m', coffre:'385L' },
+  born_58:    { label:'Cupra Born 58 kWh', min:19000, max:28000, cible:23000, bat:58, range:320, charge_max:135, fiabilite:'bonne', cat:'compacte', longueur:'4.32m', coffre:'385L' },
+  born_77:    { label:'Cupra Born 77 kWh', min:24000, max:34000, cible:28000, bat:77, range:420, charge_max:135, fiabilite:'bonne', cat:'compacte', longueur:'4.32m', coffre:'385L' },
+  mg4_49:     { label:'MG4 49 kWh Standard', min:15000, max:22000, cible:18000, bat:49, range:270, charge_max:140, fiabilite:'inconnue', cat:'compacte', longueur:'4.29m', coffre:'363L' },
+  mg4_64:     { label:'MG4 64 kWh Extended', min:19000, max:27000, cible:22000, bat:64, range:350, charge_max:150, fiabilite:'inconnue', cat:'compacte', longueur:'4.29m', coffre:'363L' },
+  mg4_77:     { label:'MG4 77 kWh Trophy', min:22000, max:31000, cible:25500, bat:77, range:450, charge_max:150, fiabilite:'inconnue', cat:'compacte', longueur:'4.29m', coffre:'363L' },
+  e308:       { label:'Peugeot e-308', min:24000, max:33000, cible:27500, bat:54, range:340, charge_max:100, fiabilite:'bonne', cat:'compacte', longueur:'4.37m', coffre:'412L' },
+  astra_e:    { label:'Opel Astra Electric', min:22000, max:30000, cible:25000, bat:54, range:330, charge_max:100, fiabilite:'bonne', cat:'compacte', longueur:'4.37m', coffre:'352L' },
+  ec4:        { label:'Citroën ë-C4 54 kWh', min:18000, max:26000, cible:21000, bat:54, range:310, charge_max:100, fiabilite:'bonne', cat:'compacte', longueur:'4.36m', coffre:'380L' },
+  model3_sr:  { label:'Tesla Model 3 Standard Range', min:21000, max:29000, cible:24000, bat:60, range:380, charge_max:170, fiabilite:'très bonne', cat:'berline', longueur:'4.72m', coffre:'594L' },
+  model3_lr:  { label:'Tesla Model 3 Grande Autonomie', min:29000, max:39000, cible:33000, bat:75, range:520, charge_max:250, fiabilite:'très bonne', cat:'berline', longueur:'4.72m', coffre:'594L' },
+  model3_perf:{ label:'Tesla Model 3 Performance', min:33000, max:45000, cible:38000, bat:75, range:460, charge_max:250, fiabilite:'très bonne', cat:'berline', longueur:'4.72m', coffre:'594L' },
+  i4_40:      { label:'BMW i4 eDrive40', min:36000, max:50000, cible:42000, bat:80, range:400, charge_max:200, fiabilite:'bonne', cat:'premium', longueur:'4.78m', coffre:'470L' },
+  ioniq6_53:  { label:'Hyundai Ioniq 6 53 kWh', min:25000, max:34000, cible:29000, bat:53, range:360, charge_max:350, fiabilite:'très bonne', cat:'berline', longueur:'4.86m', coffre:'401L' },
+  ioniq6_77:  { label:'Hyundai Ioniq 6 77 kWh', min:31000, max:44000, cible:36000, bat:77, range:450, charge_max:350, fiabilite:'très bonne', cat:'berline', longueur:'4.86m', coffre:'401L' },
+  id7:        { label:'VW ID.7 77 kWh', min:38000, max:52000, cible:44000, bat:77, range:450, charge_max:200, fiabilite:'bonne', cat:'premium', longueur:'4.96m', coffre:'532L' },
+  inster_42:  { label:'Hyundai Inster 42 kWh', min:16000, max:22000, cible:18500, bat:42, range:240, charge_max:85, fiabilite:'inconnue', cat:'citadine', longueur:'3.82m', coffre:'280L' },
+  inster_49:  { label:'Hyundai Inster 49 kWh LR', min:18000, max:25000, cible:21000, bat:49, range:290, charge_max:85, fiabilite:'inconnue', cat:'citadine', longueur:'3.82m', coffre:'280L' },
+  r5_40:      { label:'Renault R5 E-Tech 40 kWh', min:19000, max:26000, cible:22000, bat:40, range:280, charge_max:100, fiabilite:'bonne', cat:'citadine', longueur:'3.92m', coffre:'326L' },
+  r5_52:      { label:'Renault R5 E-Tech 52 kWh', min:22000, max:30000, cible:25500, bat:52, range:360, charge_max:100, fiabilite:'bonne', cat:'citadine', longueur:'3.92m', coffre:'326L' },
+  e208_50:    { label:'Peugeot e-208 50 kWh', min:14000, max:22000, cible:17500, bat:50, range:290, charge_max:100, fiabilite:'bonne', cat:'citadine', longueur:'4.06m', coffre:'265L' },
+  leaf_40:    { label:'Nissan Leaf 40 kWh', min:9000, max:18000, cible:13000, bat:40, range:180, charge_max:50, fiabilite:'très bonne', cat:'compacte', longueur:'4.49m', coffre:'435L' },
+  zoe_52:     { label:'Renault Zoé ZE50', min:8000, max:16000, cible:11000, bat:52, range:250, charge_max:50, fiabilite:'bonne', cat:'citadine', longueur:'4.09m', coffre:'338L' },
+  spring:     { label:'Dacia Spring', min:6000, max:12000, cible:8500, bat:26.8, range:160, charge_max:30, fiabilite:'bonne', cat:'citadine', longueur:'3.73m', coffre:'270L' },
+  autre:      { label:'Modèle non listé', min:null, max:null, cible:null, bat:null, range:null, charge_max:null, fiabilite:'inconnue', cat:'inconnu', longueur:'—', coffre:'—' }
+};
+
+// ─────────────────────────────────────────────
+// DÉFAUTS CONNUS & AXES DE NÉGOCIATION
+// ─────────────────────────────────────────────
+const DEFAUTS = {
+  megane60: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'élevé', titre:'Chargeur AC 22 kW défaillant', detail:'Sur certains millésimes 2022, la recharge AC s\'interrompt sans raison. Testez sur borne AC avant achat.' },
+      { niveau:'élevé', titre:'Écran OpenR Link — bugs fréquents', detail:'Blocages complets, redémarrages intempestifs, écran noir. Pilote la caméra de recul et la navigation.' },
+      { niveau:'moyen', titre:'Poignées de portes motorisées', detail:'Les poignées affleurantes peuvent se bloquer. Testez chaque porte à froid et à chaud.' },
+      { niveau:'moyen', titre:'Autonomie hiver sans PAC', detail:'Sans pompe à chaleur, l\'autonomie chute de 35–40% sous 5°C. Vérifiez la fiche technique.' },
+    ],
+    nego:[
+      { axe:'Chargeur AC', script:'"J\'ai lu que le chargeur 22 kW est défaillant sur les 2022. Si vous ne pouvez pas me faire une démonstration, j\'attends une remise."' },
+      { axe:'OpenR Link bugué', script:'"L\'écran fait des bugs selon les retours propriétaires. J\'ai besoin d\'une garantie 12 mois incluse pour couvrir une éventuelle intervention."' },
+      { axe:'Absence de PAC', script:'"Sans pompe à chaleur, je perds 40% d\'autonomie en hiver. Ça ne vaut pas le même prix — je veux un geste de 800€."' },
+    ],
+    rappels:[],
+    verifications:['Tester chaque poignée de porte','Vérifier présence PAC sur fiche technique','Lancer une charge AC complète','Tester écran OpenR sur route 30 min']
+  },
+  megane40: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'élevé', titre:'Autonomie réelle très limitée', detail:'40 kWh = 180–210 km réels en hiver. Pour 20 000 km/an, les longs trajets nécessitent 2 à 3 pauses.' },
+      { niveau:'moyen', titre:'Écran OpenR Link — bugs', detail:'Mêmes problèmes que le 60 kWh : redémarrages, pertes de fonctions.' },
+      { niveau:'faible', titre:'Charge AC limitée à 7,4 kW', detail:'Sans option 22 kW, la recharge AC prend 6h pour un plein.' },
+    ],
+    nego:[
+      { axe:'Autonomie insuffisante', script:'"180 km réels en hiver pour 20 000 km/an, c\'est contraignant. Je cherche le 60 kWh ou je veux un geste de 1 500€."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Tester autonomie affichée à froid','Confirmer charge AC disponible']
+  },
+  id3_58: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Ergonomie intérieure 2022 et avant', detail:'La version 2020–2022 souffrait de finitions légères. Le restylage 2023 améliore nettement — privilégiez un 2023+.' },
+      { niveau:'moyen', titre:'Autonomie réelle inférieure au WLTP', detail:'L\'ID.3 affiche souvent 15–20% de moins que le WLTP en usage réel, notamment sur autoroute.' },
+    ],
+    nego:[
+      { axe:'Millésime 2022 ou moins', script:'"Les finitions 2022 ont été critiquées. Je préfère attendre un 2023+ ou alors j\'ai besoin d\'un effort de 1 500€."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier millésime (2023 de préférence)','Confirmer pompe à chaleur installée','Vérifier SoH batterie']
+  },
+  id3_77: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Prix élevé en occasion', detail:'Le 77 kWh se négocie cher — vérifiez que le différentiel vs 58 kWh est justifié par votre usage réel.' },
+      { niveau:'faible', titre:'Logiciel — quelques bugs persistants', detail:'Des bugs de navigation et de connectivité sont encore signalés.' },
+    ],
+    nego:[
+      { axe:'Prix premium occasion', script:'"Pour 77 kWh, je trouve des offres à [X€] sur La Centrale. Si vous êtes au-dessus, alignez-vous."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie 77 kWh','Tester charge DC rapide','Confirmer PAC présente']
+  },
+  born_58: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'critique', titre:'RAPPEL 2026 — Batterie haute tension', detail:'Rappel officiel (code 93W1) sur les Born produits du 09/02/2023 au 30/12/2025 pour module batterie défectueux pouvant provoquer une surchauffe et un incendie. Vérifiez impérativement si le rappel a été effectué.' },
+      { niveau:'moyen', titre:'Bugs logiciels (même plateforme ID.3)', detail:'Navigation et interface. Le restylage 2023 améliore la situation.' },
+    ],
+    nego:[
+      { axe:'Rappel batterie non effectué', script:'"Ce véhicule est concerné par le rappel 93W1 sur la batterie haute tension. Je ne signe pas avant confirmation écrite que le rappel a été fait chez un concessionnaire Cupra."' },
+      { axe:'Rappel effectué', script:'"Même après le rappel, je veux une garantie 12 mois pour couvrir tout risque résiduel lié à ce problème de batterie."' },
+    ],
+    rappels:[{ code:'93W1', titre:'Module batterie haute tension', detail:'Risque incendie — Born produits 09/02/2023 au 30/12/2025. Vérification obligatoire.' }],
+    verifications:['URGENT : Vérifier rappel 93W1 effectué','Demander attestation écrite concessionnaire','Tester charge complète post-rappel','Vérifier SoH batterie']
+  },
+  born_77: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'critique', titre:'RAPPEL 2026 — Batterie haute tension', detail:'Même rappel 93W1 que le Born 58 kWh si produit entre 09/02/2023 et 30/12/2025.' },
+    ],
+    nego:[
+      { axe:'Rappel batterie', script:'"Je veux la preuve écrite que le rappel 93W1 a été effectué. Sans ça, je ne peux pas acheter ce véhicule."' },
+    ],
+    rappels:[{ code:'93W1', titre:'Module batterie haute tension', detail:'Risque incendie — vérification obligatoire avant achat.' }],
+    verifications:['URGENT : Vérifier rappel 93W1','Demander attestation concessionnaire','Tester charge DC']
+  },
+  mg4_49: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'moyen', titre:'Recul terrain limité en France', detail:'La MG4 est récente — peu de données sur la fiabilité long terme de la batterie.' },
+      { niveau:'moyen', titre:'Valeur résiduelle incertaine', detail:'La dépréciation des véhicules chinois sur le marché français est plus forte qu\'attendu. Risque à la revente.' },
+      { niveau:'moyen', titre:'Réseau SAV MG limité', detail:'Hors grandes villes les délais de prise en charge peuvent être longs.' },
+    ],
+    nego:[
+      { axe:'Incertitude long terme', script:'"La MG4 n\'a pas encore de recul sur 5 ans en France. Pour compenser ce risque, je veux le prix au bas de la fourchette marché, soit [X€]."' },
+      { axe:'VR incertaine', script:'"La revente d\'une MG4 dans 3 ans est incertaine. Je veux une garantie 12 mois incluse pour sécuriser les premières années."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Contrôler état intérieur','Vérifier réseau SAV proche domicile','Tester charge DC']
+  },
+  mg4_64: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'moyen', titre:'Fiabilité long terme inconnue', detail:'Pas assez de recul sur la durabilité des batteries MG en France.' },
+      { niveau:'moyen', titre:'Dépréciation rapide', detail:'Les MG4 perdent de la valeur plus vite que les concurrents européens.' },
+    ],
+    nego:[
+      { axe:'Risque dépréciation', script:'"Les MG4 se déprécient vite. Je veux un prix à [ref.min€] maximum pour me protéger à la revente."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie obligatoire','Test charge DC 150 kW']
+  },
+  mg4_77: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'moyen', titre:'Prix occasion parfois surévalué', detail:'Les Trophy Extended sont rares et certains vendeurs surestiment leur valeur. Comparez avec La Centrale.' },
+      { niveau:'moyen', titre:'Pneus 19 pouces — coût élevé', detail:'Remplacement d\'un jeu de pneus 235/45/19 : 600–800€. Vérifiez l\'usure avant achat.' },
+    ],
+    nego:[
+      { axe:'Pneus usés', script:'"Les pneus 19 pouces sont usés — comptez 700€ de remplacement. Je déduis ça du prix proposé."' },
+    ],
+    rappels:[],
+    verifications:['Mesurer profil pneus 19"','SoH batterie 77 kWh','Tester toutes fonctions Trophy']
+  },
+  e308: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Autonomie réelle en dessous du WLTP', detail:'~310 km réels en usage mixte. En hiver sans PAC, comptez 250 km.' },
+      { niveau:'moyen', titre:'Charge DC limitée à 100 kW', detail:'100 kW max en DC — derrière les Ioniq 6 (350 kW) ou ID.3 (170 kW).' },
+    ],
+    nego:[
+      { axe:'Charge DC lente', script:'"100 kW de charge DC, c\'est en dessous du marché actuel. Pour des longs trajets réguliers, c\'est contraignant — je veux un effort sur le prix."' },
+      { axe:'PAC absente', script:'"Sans pompe à chaleur, l\'autonomie hiver chute sous 250 km. C\'est un défaut notable pour ce prix."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier présence PAC','Tester charge DC','Contrôler logiciel multimédia']
+  },
+  astra_e: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Autonomie réelle décevante', detail:'~310–330 km en usage réel. Les propriétaires signalent une surconsommation autoroute.' },
+      { niveau:'moyen', titre:'Charge DC limitée à 100 kW', detail:'Même limitation que la e-308 — pauses plus longues sur longs trajets.' },
+    ],
+    nego:[
+      { axe:'Autonomie réelle', script:'"310 km réels pour ce prix, c\'est en dessous de la concurrence. Je veux le prix aligné sur la fourchette basse du marché."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Confirmer PAC installée']
+  },
+  ec4: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Pas de pompe à chaleur de série', detail:'La PAC n\'est pas systématique sur toutes les finitions ë-C4. Sans elle, autonomie hiver réduite.' },
+      { niveau:'faible', titre:'Charge DC limitée à 100 kW', detail:'100 kW maximum — acceptable pour usage quotidien, limitant pour longs trajets.' },
+    ],
+    nego:[
+      { axe:'PAC absente', script:'"Cette ë-C4 n\'a pas de pompe à chaleur. En hiver ça représente 30% d\'autonomie en moins — je veux 800€ de remise."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier présence PAC sur fiche','SoH batterie']
+  },
+  model3_sr: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'élevé', titre:'Finition et qualité d\'assemblage', detail:'Tesla est connue pour ses problèmes de joints, peinture, et alignement de carrosserie. Inspectez minutieusement chaque joint et panneau en plein jour.' },
+      { niveau:'élevé', titre:'Image de marque dégradée en France', detail:'Les immatriculations Tesla ont chuté de 47% en 2025. Cela affecte la valeur de revente.' },
+      { niveau:'moyen', titre:'Suspension ferme — inconfort sur pavés', detail:'Réglage sport par défaut — mauvaise isolation des nids-de-poule et pavés parisiens.' },
+    ],
+    nego:[
+      { axe:'Défauts carrosserie', script:'"J\'ai inspecté la carrosserie — il y a [défaut identifié]. Chez Tesla c\'est documenté. Je veux [X€] de remise pour ça."' },
+      { axe:'Image de marque', script:'"Les Tesla ont perdu 40% de valeur en 2 ans en occasion. Pour me protéger à la revente, j\'ai besoin d\'être au prix bas du marché."' },
+    ],
+    rappels:[],
+    verifications:['Inspection carrosserie complète en plein jour','Vérifier SoH via compte Tesla','Tester sur pavés et ralentisseurs','Contrôler joints de portes et coffre']
+  },
+  model3_lr: {
+    gravite:'élevée',
+    defauts:[
+      { niveau:'critique', titre:'Batterie LG NMC811 — dégradation rapide', detail:'Les Model 3 LR équipées de batteries LG NMC811 présentent une usure structurelle documentée. Le remplacement complet de batterie coûte 12 000–18 000€.' },
+      { niveau:'élevé', titre:'Finition carrosserie', detail:'Mêmes problèmes que le SR — inspectez rigoureusement chaque panneau et joint.' },
+      { niveau:'moyen', titre:'Valeur résiduelle en chute libre', detail:'La forte décote Tesla en occasion (jusqu\'à -50% signalée) rend la LR difficile à revendre.' },
+    ],
+    nego:[
+      { axe:'Batterie LG problématique', script:'"Je sais que les LR avec batterie LG NMC811 ont des problèmes de dégradation structurelle documentés. Je veux le rapport SoH complet et si le SoH est sous 85%, je veux une remise de [X€]."' },
+      { axe:'Dépréciation', script:'"Les Model 3 LR ont perdu jusqu\'à 50% en occasion. Pour rentrer dans mes frais à la revente, je dois être à [X€] maximum."' },
+    ],
+    rappels:[],
+    verifications:['PRIORITÉ : Rapport SoH via compte Tesla propriétaire','Identifier type cellule batterie (LG vs Panasonic)','Inspection carrosserie complète','Tester autonomie réelle sur 100 km']
+  },
+  model3_perf: {
+    gravite:'élevée',
+    defauts:[
+      { niveau:'critique', titre:'Batterie LG NMC811 — même problème que LR', detail:'Mêmes risques de dégradation structurelle. Sur une Performance, encore plus sollicitée.' },
+      { niveau:'élevé', titre:'Pneus 20 pouces — coût exorbitant', detail:'Un jeu de pneus Michelin Pilot Sport 4S en 235/35/20 coûte 1 200–1 500€.' },
+      { niveau:'moyen', titre:'Suspension abaissée — inconfort urbain', detail:'Le mode Performance inclut des ressorts plus courts — encore plus ferme que le SR.' },
+    ],
+    nego:[
+      { axe:'Pneus 20" usés', script:'"Les pneus 20 pouces sont usés — comptez 1 400€ de remplacement. Je les déduis du prix."' },
+      { axe:'Batterie', script:'"Je veux le rapport SoH complet avant signature. Si sous 85%, je veux une remise équivalente à la dépréciation batterie."' },
+    ],
+    rappels:[],
+    verifications:['Mesurer profil pneus 20"','Rapport SoH obligatoire','Test suspension sur pavés','Inspection carrosserie']
+  },
+  i4_40: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Fuite de liquide de refroidissement (2022)', detail:'Signalée sur certains millésimes 2022. Vérifiez l\'historique entretien si le véhicule est 2022.' },
+      { niveau:'moyen', titre:'Direction bruyante (cas isolés)', detail:'Des bruits de craquement dans la colonne de direction ont été signalés. Testez à basse vitesse.' },
+    ],
+    nego:[
+      { axe:'Millésime 2022', script:'"Les i4 2022 ont eu des problèmes de liquide de refroidissement. Je veux l\'historique d\'entretien complet et une garantie 12 mois incluse."' },
+      { axe:'Prix élevé', script:'"Pour une i4 de cet âge et ce kilométrage, le marché est à [X€] sur La Centrale. Alignez-vous et je signe."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier historique entretien pour fuite refroidissement','Tester direction à basse vitesse','Contrôler niveau liquide refroidissement']
+  },
+  ioniq6_53: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Coffre 401 L — accès difficile', detail:'Le coffre est profond mais l\'ouverture est étroite. Testez le chargement avant achat.' },
+      { niveau:'moyen', titre:'Puissance réduite sous 40% de batterie', detail:'La gestion thermique réduit la puissance disponible sous 40% de charge.' },
+    ],
+    nego:[
+      { axe:'Coffre', script:'"Le coffre est peu pratique au quotidien. Combiné au prix, je veux un geste de 500€."' },
+    ],
+    rappels:[],
+    verifications:['Tester chargement coffre','Vérifier SoH batterie','Tester puissance sous 40% de charge','Confirmer charge V2L fonctionnelle']
+  },
+  ioniq6_77: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Coffre — même limitation', detail:'Accès au coffre difficile, 401 L net. Contraignant pour une famille avec bagages.' },
+      { niveau:'moyen', titre:'Prix occasion élevé', detail:'L\'Ioniq 6 77 kWh est la référence du segment — peu de remises accordées.' },
+    ],
+    nego:[
+      { axe:'Prix marché', script:'"Les Ioniq 6 77 kWh se trouvent à [X€] sur La Centrale. Votre prix est plus élevé. Alignez-vous ou je passe à l\'annonce suivante."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie 77 kWh','Test charge 800V DC','Vérifier câble V2L inclus']
+  },
+  id7: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Prix catalogue élevé', detail:'L\'ID.7 neuf dépasse 55 000€ — hors plafond bonus. En occasion les prix restent élevés et la décote est lente.' },
+      { niveau:'moyen', titre:'Gabarit imposant', detail:'4,96 m — à tester dans votre parking. Le rayon de braquage est large.' },
+    ],
+    nego:[
+      { axe:'Prix élevé', script:'"Pour une ID.7 de cet âge, le marché est à [X€] sur La Centrale. Au-delà, je regarde une Ioniq 6 77 kWh moins chère et mieux notée en charge DC."' },
+    ],
+    rappels:[],
+    verifications:['Tester stationnement gabarit','SoH batterie 77 kWh','Confirmer PAC installée']
+  },
+  inster_42: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'élevé', titre:'Charge DC limitée à 15 kW', detail:'15 kW maximum en DC — pour récupérer 80 km il faut 30 min. Les longs trajets sont très contraignants.' },
+      { niveau:'moyen', titre:'Très peu de recul fiabilité', detail:'L\'Inster est lancé en 2024 — pratiquement aucune donnée sur la fiabilité batterie à 50 000 km.' },
+    ],
+    nego:[
+      { axe:'Charge DC très lente', script:'"15 kW DC, c\'est insuffisant pour un usage mixte. C\'est un défaut significatif — je veux le prix au minimum du marché."' },
+    ],
+    rappels:[],
+    verifications:['Confirmer puissance charge DC','Vérifier SoH','Tester interface multimédia']
+  },
+  inster_49: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Recul fiabilité inexistant', detail:'Commercialisé en 2024 — pas de données sur la durabilité long terme.' },
+      { niveau:'faible', titre:'Format citadine', detail:'3,82 m — peu adapté aux longs trajets familiaux fréquents.' },
+    ],
+    nego:[
+      { axe:'Modèle trop récent', script:'"L\'Inster n\'a pas de recul fiabilité. Garantie 12 mois obligatoire pour que j\'achète."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Tester charge DC 85 kW','Vérifier garantie constructeur restante']
+  },
+  r5_40: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Peu de recul fiabilité (2024)', detail:'La R5 E-Tech est lancée en 2024 — pas encore de retours consolidés sur la durabilité batterie.' },
+      { niveau:'faible', titre:'Autonomie 40 kWh — limitée', detail:'~260 km réels. Suffisant pour usage quotidien mais longs trajets nécessitent des pauses.' },
+    ],
+    nego:[
+      { axe:'Modèle tout récent', script:'"La R5 n\'a pas encore de recul fiabilité. Garantie 12 mois obligatoire pour que j\'achète."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier garantie constructeur restante','SoH batterie','Tester interface Google intégré']
+  },
+  r5_52: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Peu de recul fiabilité (2024)', detail:'Modèle trop récent pour avoir du recul fiabilité.' },
+      { niveau:'faible', titre:'Prix occasion parfois gonflé', detail:'Le 52 kWh est très demandé — certains vendeurs profitent de la rareté pour surévaluer.' },
+    ],
+    nego:[
+      { axe:'Prix gonflé par rareté', script:'"La R5 52 kWh est rare en occasion — vous en profitez sur le prix. Je veux me limiter à [X€] qui est le prix de marché normal."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Garantie constructeur restante','Test charge 100 kW DC']
+  },
+  e208_50: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Batterie sans refroidissement actif liquide', detail:'Refroidissement air — en été ou après charge rapide répétée, la batterie peut se réchauffer et limiter la charge.' },
+      { niveau:'moyen', titre:'Coffre 265 L — très petit', detail:'Le plus petit coffre du segment. Contraignant même avec un enfant et des bagages.' },
+    ],
+    nego:[
+      { axe:'Coffre insuffisant', script:'"265 L de coffre, c\'est insuffisant pour une famille. Ce défaut doit se répercuter sur le prix face à une MG4 ou une Mégane E-Tech."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Tester charge DC après plusieurs charges','Vérifier état peinture (blanc nacré fragile)']
+  },
+  leaf_40: {
+    gravite:'élevée',
+    defauts:[
+      { niveau:'critique', titre:'Dégradation batterie sans refroidissement actif', detail:'La Leaf 40 kWh n\'a pas de refroidissement liquide batterie. La dégradation peut atteindre 20–30% après 80 000–100 000 km, surtout si charges rapides fréquentes.' },
+      { niveau:'élevé', titre:'Charge rapide limitée à 50 kW CHAdeMO', detail:'CHAdeMO est un format en voie de disparition — de moins en moins de bornes compatibles.' },
+      { niveau:'moyen', titre:'Clé non reconnue', detail:'Problème récurrent : la clé n\'est pas reconnue au démarrage. Testez plusieurs fois.' },
+    ],
+    nego:[
+      { axe:'Dégradation batterie', script:'"La Leaf sans refroidissement actif dégrade vite la batterie. Je veux le SoH affiché sur le tableau de bord (12 barres = 100%). Si sous 10 barres, je veux [X€] de remise ou je passe."' },
+      { axe:'CHAdeMO obsolète', script:'"CHAdeMO disparaît du réseau français. Dans 2 ans, je ne pourrai quasiment plus charger rapidement. C\'est une limitation majeure qui doit se refléter dans le prix."' },
+    ],
+    rappels:[],
+    verifications:['PRIORITÉ : Lire les 12 barres SoH au tableau de bord','Vérifier bornes CHAdeMO proches de chez vous','Tester démarrage avec clé 3 fois']
+  },
+  zoe_52: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'élevé', titre:'Refroidissement batterie par air uniquement', detail:'La Zoé ZE50 n\'a pas de refroidissement liquide — la batterie se réchauffe après charges rapides répétées.' },
+      { niveau:'moyen', titre:'Charge DC limitée à 50 kW CCS', detail:'50 kW maximum en DC — longs trajets contraignants avec des pauses de 45–60 min.' },
+      { niveau:'moyen', titre:'Problèmes de charge embarquée', detail:'Le chargeur embarqué peut présenter des erreurs. Testez une charge complète avant achat.' },
+    ],
+    nego:[
+      { axe:'Charge DC lente', script:'"50 kW DC max, c\'est très lent. Pour des longs trajets ça prend 50 min de pause. C\'est un défaut que le prix doit refléter."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Test charge complète AC','Vérifier présence chargeur 22 kW','Tester charge DC']
+  },
+  spring: {
+    gravite:'élevée',
+    defauts:[
+      { niveau:'critique', titre:'1 étoile Euro NCAP — sécurité insuffisante', detail:'La Dacia Spring a obtenu une seule étoile au crash test Euro NCAP. La protection des occupants est très en dessous des standards actuels.' },
+      { niveau:'élevé', titre:'Aucune gestion thermique batterie', detail:'Pas de refroidissement actif — la batterie se dégrade vite en été et perd massivement de l\'autonomie en hiver (~100 km par -5°C).' },
+      { niveau:'élevé', titre:'Charge DC limitée à 30 kW', detail:'30 kW maximum en DC. En option seulement sur certaines versions. Vérifiez impérativement.' },
+    ],
+    nego:[
+      { axe:'Sécurité 1 étoile', script:'"La Spring a 1 étoile NCAP. Pour une utilisation familiale, c\'est insuffisant. Soit le prix reflète ce risque, soit je cherche autre chose."' },
+      { axe:'Charge DC absente', script:'"Si la Spring n\'a pas la charge DC optionnelle, je ne peux pas l\'utiliser en dehors de la ville. Je veux une remise significative."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier présence charge DC (option payante)','Confirmer kilométrage et SoH','Évaluer autonomie affichée à froid']
+  },
+  autre: {
+    gravite:'inconnue',
+    defauts:[
+      { niveau:'moyen', titre:'Défauts non renseignés', detail:'Ce modèle n\'est pas dans notre base. Recherchez "problèmes [nom modèle] forum" avant la visite.' },
+      { niveau:'moyen', titre:'Vérifications batterie universelles', detail:'Quel que soit le modèle, toujours exiger le rapport SoH batterie et tester la charge DC avant achat.' },
+    ],
+    nego:[
+      { axe:'Modèle inconnu', script:'"J\'ai besoin du rapport SoH batterie complet et d\'un essai de 30 minutes avant toute décision sur ce modèle."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie obligatoire','Recherche rappels sur Histovec','Tester charge DC','Essai 30 min sur route']
+  }
+};
+
+// ─────────────────────────────────────────────
+// SEARCH KEYS LA CENTRALE
+// ─────────────────────────────────────────────
+const LC_KEYS = {
+  megane60:'renault-megane-e-tech', megane40:'renault-megane-e-tech',
+  id3_58:'volkswagen-id-3', id3_77:'volkswagen-id-3',
+  born_58:'cupra-born', born_77:'cupra-born',
+  mg4_49:'mg-mg4', mg4_64:'mg-mg4', mg4_77:'mg-mg4',
+  e308:'peugeot-e-308', astra_e:'opel-astra', ec4:'citroen-c4',
+  model3_sr:'tesla-model-3', model3_lr:'tesla-model-3', model3_perf:'tesla-model-3',
+  i4_40:'bmw-i4',
+  ioniq6_53:'hyundai-ioniq-6', ioniq6_77:'hyundai-ioniq-6',
+  id7:'volkswagen-id-7',
+  inster_42:'hyundai-inster', inster_49:'hyundai-inster',
+  r5_40:'renault-r5', r5_52:'renault-r5',
+  e208_50:'peugeot-e-208', leaf_40:'nissan-leaf',
+  zoe_52:'renault-zoe', spring:'dacia-spring',
+  autre:''
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+const state = { annee: 2023, vendeur: 'pro', garantie: 6 };
+
+function setAnnee(v, btn) {
+  state.annee = v;
+  btn.closest('.seg').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setSeg(field, val, btn) {
+  state[field] = val;
+  btn.closest('.seg').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function onModeleChange() {
+  const v = document.getElementById('modele').value;
+  document.getElementById('autreNomGroup').style.display = v === 'autre' ? 'block' : 'none';
+}
+
+// ─────────────────────────────────────────────
+// SCORING
+// ─────────────────────────────────────────────
+function scorePrix(prix, ref) {
+  if (!ref.cible) return { score: 1, cls: 'warn', msg: 'Références non disponibles', ecart: 0 };
+  const ratio = prix / ref.cible;
+  if (prix < ref.min) return { score: 0, cls: 'ok', msg: 'En dessous du marché — bonne affaire', ecart: Math.round(ref.cible - prix) };
+  if (ratio <= 1.06) return { score: 0, cls: 'ok', msg: 'Dans la fourchette de marché', ecart: 0 };
+  if (prix <= ref.max) return { score: 1, cls: 'warn', msg: 'Légèrement au-dessus du prix cible', ecart: Math.round(prix - ref.cible) };
+  return { score: 2, cls: 'bad', msg: 'Au-dessus du prix maximum marché', ecart: Math.round(prix - ref.max) };
+}
+
+function scoreKm(km, annee) {
+  const age = 2026 - annee;
+  const kmPerAn = km / Math.max(age, 1);
+  if (kmPerAn < 15000) return { score: 0, cls: 'ok', msg: `Faible — ${Math.round(kmPerAn/1000)}k km/an` };
+  if (kmPerAn < 22000) return { score: 0, cls: 'ok', msg: `Normal — ${Math.round(kmPerAn/1000)}k km/an` };
+  if (kmPerAn < 30000) return { score: 1, cls: 'warn', msg: `Élevé — ${Math.round(kmPerAn/1000)}k km/an` };
+  return { score: 2, cls: 'bad', msg: `Très élevé — ${Math.round(kmPerAn/1000)}k km/an` };
+}
+
+// ─────────────────────────────────────────────
+// LA CENTRALE URL
+// ─────────────────────────────────────────────
+function buildLcUrl(modeleKey, pMin, pMax) {
+  const k = LC_KEYS[modeleKey] || '';
+  if (!k) return null;
+  return `https://www.lacentrale.fr/listing?makesModelsCommercialNames=${k}&energy=ELECTRIC&priceMin=${Math.round(pMin)}&priceMax=${Math.round(pMax)}&mileageMax=150000&sortBy=priceAsc`;
+}
+
+// ─────────────────────────────────────────────
+// GAUGE HTML
+// ─────────────────────────────────────────────
+function buildGauge(prix, ref) {
+  if (!ref.min || !ref.max || !ref.cible) {
+    return '<div style="font-size:12px;color:var(--muted);padding:8px 0">Fourchette marché non disponible pour ce modèle</div>';
+  }
+
+  const padding = (ref.max - ref.min) * 0.4;
+  const trackMin = ref.min - padding;
+  const trackMax = ref.max + padding;
+  const span = trackMax - trackMin;
+
+  function pct(v) { return Math.min(100, Math.max(0, ((v - trackMin) / span) * 100)); }
+
+  const pMin = pct(ref.min);
+  const pCible = pct(ref.cible);
+  const pMax = pct(ref.max);
+  const pPrix = pct(prix);
+
+  const zoneColor = prix <= ref.cible ? 'var(--accent)' : prix <= ref.max ? 'var(--warn)' : 'var(--bad)';
+  const prixColor = zoneColor;
+
+  const zoneLeft = Math.min(pMin, pPrix);
+  const zoneRight = Math.max(pMin, pPrix);
+
+  return `
+    <div class="gauge-wrap">
+      <div class="gauge-track">
+        <div class="gauge-zone" style="left:${pMin}%;width:${pMax - pMin}%;background:var(--border2);border-radius:4px;"></div>
+        <div class="gauge-zone" style="left:${zoneLeft}%;width:${zoneRight - zoneLeft}%;background:${zoneColor};opacity:0.35;border-radius:4px;"></div>
+        <div class="gauge-dot" style="left:${pMin}%;background:var(--muted)"></div>
+        <div class="gauge-dot" style="left:${pCible}%;background:var(--accent)"></div>
+        <div class="gauge-dot" style="left:${pMax}%;background:var(--warn)"></div>
+        <div class="gauge-dot prix" style="left:${pPrix}%;background:${prixColor};box-shadow:0 0 8px ${prixColor}"></div>
+        <div class="gauge-lbl" style="left:${pMin}%">${(ref.min/1000).toFixed(0)}k</div>
+        <div class="gauge-lbl" style="left:${pCible}%">Cible<br>${(ref.cible/1000).toFixed(0)}k</div>
+        <div class="gauge-lbl" style="left:${pMax}%">${(ref.max/1000).toFixed(0)}k</div>
+        <div class="gauge-lbl prix" style="left:${pPrix}%">▲<br>Vous</div>
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// ANALYSE PRINCIPALE
+// ─────────────────────────────────────────────
+function analyser() {
+  const modeleKey = document.getElementById('modele').value;
+  const ref = MODELS[modeleKey] || MODELS.autre;
+  const prix = parseFloat(document.getElementById('prix').value) || 0;
+  const km = parseFloat(document.getElementById('km').value) || 0;
+  const annee = state.annee;
+  const garantie = state.garantie;
+  const vendeur = state.vendeur;
+  const autreNom = document.getElementById('autreNom').value.trim();
+  const nomModele = modeleKey === 'autre' ? (autreNom || 'Modèle inconnu') : ref.label;
+
+  if (!prix || prix < 500) { alert('Renseigne un prix valide (ex: 22000).'); return; }
+
+  document.getElementById('formSection').style.display = 'none';
+  document.getElementById('loading').classList.add('show');
+
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('show');
+
+    const sprix = scorePrix(prix, ref);
+    const skm = scoreKm(km, annee);
+    const age = 2026 - annee;
+    const def = DEFAUTS[modeleKey] || DEFAUTS.autre;
+
+    // Verdict global
+    const maxScore = Math.max(sprix.score, skm.score);
+    const verdicts = [
+      { cls:'ok', emoji:'✅', title:'Offre acceptable', sub:'Vous pouvez avancer vers la signature' },
+      { cls:'warn', emoji:'⚠️', title:'À renégocier', sub:'Demandez un effort avant de signer' },
+      { cls:'bad', emoji:'🚫', title:'Offre à refuser', sub:'Sortez du bureau sans signer' }
+    ];
+    const v = verdicts[Math.min(maxScore, 2)];
+
+    // Gap message
+    let gapHtml = '';
+    if (ref.cible) {
+      if (prix < ref.min) {
+        const gain = (ref.min - prix).toLocaleString('fr');
+        gapHtml = `<div class="lc-gap ok">✓ Bonne affaire — ${gain}€ en dessous du prix minimum marché</div>`;
+      } else if (prix <= ref.cible) {
+        const diff = (ref.cible - prix).toLocaleString('fr');
+        gapHtml = `<div class="lc-gap ok">✓ Dans la fourchette — ${diff}€ sous le prix cible</div>`;
+      } else if (prix <= ref.max) {
+        const diff = (prix - ref.cible).toLocaleString('fr');
+        gapHtml = `<div class="lc-gap warn">⚠ +${diff}€ au-dessus du prix cible (${ref.cible.toLocaleString('fr')}€)</div>`;
+      } else {
+        const diff = (prix - ref.max).toLocaleString('fr');
+        gapHtml = `<div class="lc-gap bad">✗ +${diff}€ au-dessus du prix maximum marché — refusez ou contre-proposez</div>`;
+      }
+    }
+
+    // La Centrale URL
+    const lcUrl = ref.min ? buildLcUrl(modeleKey, ref.min * 0.9, ref.max * 1.1) : null;
+    const lcBtnHtml = lcUrl ? `
+      <a class="btn-lc" href="${lcUrl}" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Voir sur La Centrale
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>` : '';
+
+    // Rappels critiques
+    const rappelsHtml = def.rappels && def.rappels.length
+      ? def.rappels.map(r => `
+        <div class="rappel-banner">
+          <strong>🚨 RAPPEL CONSTRUCTEUR — ${r.code} : ${r.titre}</strong>
+          ${r.detail}
+        </div>`).join('')
+      : '';
+
+    // Défauts
+    const defautsHtml = def.defauts.map(d => `
+      <div class="defaut-card ${d.niveau}">
+        <div class="defaut-badge ${d.niveau}">${d.niveau.toUpperCase()}</div>
+        <div class="defaut-titre">${d.titre}</div>
+        <div class="defaut-detail">${d.detail}</div>
+      </div>`).join('');
+
+    // Négociation scripts
+    let negoScripts = [...def.nego];
+    if (sprix.score >= 1 && ref.cible) {
+      negoScripts.unshift({ axe:'Prix trop élevé', script:`"J'ai regardé sur La Centrale — le même modèle se trouve à ${ref.cible.toLocaleString('fr')}€. Au prix que vous me proposez, je passe. Appelez-moi si vous pouvez vous aligner."` });
+    }
+    if (skm.score >= 1) {
+      negoScripts.push({ axe:'Kilométrage élevé', script:`"Avec ${km.toLocaleString('fr')} km, le véhicule approche un seuil d'entretien. Je veux une remise pour anticiper ces coûts."` });
+    }
+    const negoHtml = negoScripts.map(n => `
+      <div class="nego-card">
+        <div class="nego-axe">${n.axe}</div>
+        <div class="nego-script" onclick="copyScript(this)">${n.script}</div>
+        <div class="nego-copy-hint">Appuyez pour copier</div>
+      </div>`).join('');
+
+    // Vigilances
+    const vigs = [];
+    if (km > 80000) vigs.push({ level:'high', title:'Demandez le rapport SoH batterie', detail:`Au-delà de 80 000 km, la dégradation est mesurable. Exigez un état de santé batterie (SoH) > 80%.` });
+    if (age >= 4 && garantie === 0) vigs.push({ level:'high', title:`Aucune garantie sur ${age} ans`, detail:`Un véhicule de ${age} ans sans garantie vous expose à des réparations imprévisibles dès les premiers mois.` });
+    if (vendeur === 'particulier') vigs.push({ level:'med', title:'Vente particulier : pas de recours', detail:`Faites expertiser (Dekra, Autovision ~150€) avant tout versement. Vérifiez l'historique sur HistoVec (gratuit).` });
+    if (ref.fiabilite === 'inconnue') vigs.push({ level:'med', title:'Modèle sans recul fiabilité France', detail:`${nomModele} est récent — pas de données sur la tenue long terme de la batterie et des organes électroniques.` });
+    if (ref.charge_max && ref.charge_max < 50) vigs.push({ level:'med', title:'Charge DC très lente', detail:`${ref.charge_max} kW max en courant continu — les longs trajets nécessitent des pauses très longues.` });
+    if (vigs.length === 0) vigs.push({ level:'low', title:'Aucun point de vigilance critique', detail:'Le profil du véhicule ne présente pas d\'alerte majeure selon les données disponibles.' });
+    const vigsHtml = vigs.map(vig => `
+      <div class="vig-item">
+        <div class="vig-dot ${vig.level}"></div>
+        <div><div class="vig-title">${vig.title}</div><div class="vig-detail">${vig.detail}</div></div>
+      </div>`).join('');
+
+    // Vérifications
+    const verifHtml = def.verifications.length
+      ? `<ul class="check-list">${def.verifications.map(c => `<li>${c}</li>`).join('')}</ul>`
+      : '';
+
+    // Spec card
+    const specHtml = ref.bat ? `
+      <div class="spec-card">
+        <div><div class="spec-item-label">Batterie</div><div class="spec-item-value">${ref.bat} kWh</div></div>
+        <div><div class="spec-item-label">Autonomie réelle</div><div class="spec-item-value">${ref.range ? ref.range + ' km' : '—'}</div></div>
+        <div><div class="spec-item-label">Charge DC max</div><div class="spec-item-value">${ref.charge_max ? ref.charge_max + ' kW' : '—'}</div></div>
+        <div><div class="spec-item-label">Fiabilité</div><div class="spec-item-value">${ref.fiabilite}</div></div>
+        <div><div class="spec-item-label">Longueur</div><div class="spec-item-value">${ref.longueur}</div></div>
+        <div><div class="spec-item-label">Coffre</div><div class="spec-item-value">${ref.coffre}</div></div>
+      </div>` : '';
+
+    // ── RENDU ──
+    const rapport = document.getElementById('rapport');
+    rapport.innerHTML = `
+      <div class="verdict-banner ${v.cls}">
+        <div class="verdict-emoji">${v.emoji}</div>
+        <div class="verdict-title">${v.title}</div>
+        <div class="verdict-sub">${nomModele} · ${prix.toLocaleString('fr')}€ · ${km.toLocaleString('fr')} km · ${annee}</div>
+        <div class="verdict-sub">${v.sub}</div>
+      </div>
+
+      <div class="r-label">Comparatif La Centrale</div>
+
+      <div class="lc-card">
+        <div class="lc-header">
+          <div class="lc-proposed">
+            <div class="lc-proposed-label">Prix proposé</div>
+            <div class="lc-proposed-price" style="color:${sprix.cls === 'ok' ? 'var(--accent)' : sprix.cls === 'warn' ? 'var(--warn)' : 'var(--bad)'}">${prix.toLocaleString('fr')}€</div>
+          </div>
+          ${ref.cible ? `<div class="lc-market">
+            <div class="lc-market-label">Marché La Centrale</div>
+            <div class="lc-market-range">${ref.min.toLocaleString('fr')}€ – ${ref.max.toLocaleString('fr')}€</div>
+            <div class="lc-market-cible" style="color:var(--accent)">${ref.cible.toLocaleString('fr')}€ cible</div>
+          </div>` : ''}
+        </div>
+
+        ${buildGauge(prix, ref)}
+        ${gapHtml}
+        ${lcBtnHtml}
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-label">Score prix</div>
+          <div class="stat-card-value ${sprix.cls}">${sprix.score === 0 ? 'Bon' : sprix.score === 1 ? 'Élevé' : 'Trop cher'}</div>
+          <div class="stat-card-sub">${sprix.msg}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Kilométrage</div>
+          <div class="stat-card-value ${skm.cls}">${skm.score === 0 ? 'OK' : skm.score === 1 ? 'Élevé' : 'Très élevé'}</div>
+          <div class="stat-card-sub">${skm.msg}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Garantie</div>
+          <div class="stat-card-value ${garantie === 0 && age > 2 ? 'warn' : garantie >= 12 ? 'ok' : 'ok'}">${garantie === 0 ? 'Aucune' : garantie + ' mois'}</div>
+          <div class="stat-card-sub">${age} ans · ${vendeur}</div>
+        </div>
+      </div>
+
+      ${specHtml ? `<div class="r-label">Fiche technique</div>${specHtml}` : ''}
+
+      ${rappelsHtml ? `<div class="r-label">Rappels constructeur</div>${rappelsHtml}` : ''}
+
+      <div class="r-label">Défauts connus — ${nomModele}</div>
+      ${defautsHtml}
+
+      <div class="r-label">Scripts de négociation</div>
+      ${negoHtml}
+
+      <div class="r-label">Points de vigilance</div>
+      ${vigsHtml}
+
+      ${verifHtml ? `<div class="r-label">Checklist à vérifier sur place</div>${verifHtml}` : ''}
+
+      <button class="btn-secondary" onclick="recommencer()">← Nouvelle analyse</button>
+    `;
+
+    rapport.classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  }, 700);
+}
+
+function copyScript(el) {
+  const text = el.textContent.trim();
+  navigator.clipboard.writeText(text).catch(() => {});
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function recommencer() {
+  document.getElementById('rapport').classList.remove('show');
+  document.getElementById('rapport').innerHTML = '';
+  document.getElementById('formSection').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>

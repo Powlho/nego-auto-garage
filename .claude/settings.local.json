@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs ls *)",
+      "Bash(find \"C:\\\\Users\\\\genti\\\\Downloads\\\\nego-clean-v2\" -type f -exec ls -lh {} \\\\;)",
+      "Bash(gh --version)",
+      "Bash(vercel --version)",
+      "Bash(git --version)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(winget install *)"
+    ]
+  }
+}
