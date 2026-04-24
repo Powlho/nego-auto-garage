@@ -459,6 +459,146 @@ select {
 }
 .r-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+/* ── TAB NAV ── */
+.tab-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 4px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  color: var(--muted2);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.tab-btn.active {
+  background: var(--card2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+.tab-badge {
+  background: var(--accent);
+  color: #080810;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ── FAVORIS CARDS ── */
+.fav-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.fav-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.fav-card-title { font-family: var(--display); font-size: 15px; font-weight: 800; line-height: 1.2; }
+.fav-card-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+.fav-card-delete:hover { color: var(--bad); }
+.fav-card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.fav-meta-chip {
+  font-size: 11px;
+  color: var(--muted2);
+  background: var(--card2);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.fav-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.fav-score.ok { background: var(--accent-dim); color: var(--accent); }
+.fav-score.warn { background: var(--warn-dim); color: var(--warn); }
+.fav-score.bad { background: var(--bad-dim); color: var(--bad); }
+.fav-card-date { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+.btn-reanalyze {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent-dim);
+  border: 1px solid rgba(0,229,160,0.25);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-reanalyze:hover { background: rgba(0,229,160,0.2); }
+.fav-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.fav-empty-icon { font-size: 40px; display: block; margin-bottom: 16px; }
+
+/* ── SAVE FAV BUTTON ── */
+.btn-save-fav {
+  width: 100%;
+  padding: 13px;
+  margin-top: 0;
+  background: transparent;
+  border: 1px solid rgba(0,229,160,0.3);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-save-fav:hover { background: var(--accent-dim); }
+.btn-save-fav.saved { color: var(--muted); border-color: var(--border); cursor: default; }
+
 /* COPY TOAST */
 .toast {
   position: fixed;
@@ -485,6 +625,12 @@ select {
     <div class="logo">NÉGO<em>AUTO</em></div>
     <div class="tagline">GARAGE · VE OCCASION · FRANCE 2026</div>
   </header>
+
+  <!-- TAB NAV -->
+  <div class="tab-nav" id="tabNav">
+    <button class="tab-btn active" id="tabAnalyser" onclick="switchView('analyser')">🔍 Analyser</button>
+    <button class="tab-btn" id="tabFavoris" onclick="switchView('favoris')">❤️ Mes favoris <span class="tab-badge" id="favCount" style="display:none">0</span></button>
+  </div>
 
   <!-- FORM -->
   <div id="formSection">
@@ -618,6 +764,11 @@ select {
       <span class="loading-dot"></span>
     </div>
     Comparaison en cours…
+  </div>
+
+  <!-- FAVORIS -->
+  <div id="favorisSection" style="display:none">
+    <div id="favorisList"></div>
   </div>
 
   <!-- RAPPORT -->
@@ -1466,6 +1617,7 @@ function analyser() {
   if (!prix || prix < 500) { alert('Renseigne un prix valide (ex: 22000).'); return; }
 
   document.getElementById('formSection').style.display = 'none';
+  document.getElementById('tabNav').style.display = 'none';
   document.getElementById('loading').classList.add('show');
 
   setTimeout(() => {
@@ -1646,7 +1798,15 @@ function analyser() {
         <button class="btn-primary" style="margin-top:0" onclick="saveCustomModel('${nomModele.replace(/'/g,"\\'")}', '${nomModele.toLowerCase().replace(/\s+/g,'+')}', '${nomModele.toLowerCase().replace(/\s+/g,'+')}')">+ Ajouter "${nomModele}" à ma liste</button>
       </div>` : ''}
 
-      <button class="btn-secondary" onclick="recommencer()">← Nouvelle analyse</button>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <button class="btn-save-fav" id="btnSaveFav" onclick="saveFavori({
+          modeleKey:'${modeleKey}', label:'${nomModele.replace(/'/g,"\\'")}',
+          prix:${prix}, km:${km}, annee:${annee}, vendeur:'${vendeur}', garantie:${garantie},
+          scorePrix:${sprix.score}, clsPrix:'${sprix.cls}',
+          scoreKm:${skm.score}, clsKm:'${skm.cls}'
+        })">❤️ Sauvegarder en favori</button>
+        <button class="btn-secondary" style="margin-top:0" onclick="recommencer()">← Nouvelle analyse</button>
+      </div>
     `;
 
     rapport.classList.add('show');
@@ -1660,12 +1820,108 @@ function copyScript(el) {
   showToast('Phrase copiée ✓');
 }
 
+// ─────────────────────────────────────────────
+// FAVORIS
+// ─────────────────────────────────────────────
+function getFavoris() {
+  return JSON.parse(localStorage.getItem('favoris') || '[]');
+}
+
+function saveFavori(fav) {
+  const list = getFavoris();
+  const exists = list.find(f => f.modeleKey === fav.modeleKey && f.prix === fav.prix && f.km === fav.km);
+  if (exists) { showToast('Déjà dans tes favoris'); return; }
+  list.unshift({ ...fav, id: Date.now().toString(), savedAt: new Date().toISOString().slice(0,10) });
+  localStorage.setItem('favoris', JSON.stringify(list));
+  updateFavCount();
+  showToast('❤️ Ajouté aux favoris');
+  document.getElementById('btnSaveFav').classList.add('saved');
+  document.getElementById('btnSaveFav').textContent = '✓ Sauvegardé dans mes favoris';
+}
+
+function deleteFavori(id) {
+  const list = getFavoris().filter(f => f.id !== id);
+  localStorage.setItem('favoris', JSON.stringify(list));
+  updateFavCount();
+  renderFavoris();
+}
+
+function updateFavCount() {
+  const n = getFavoris().length;
+  const badge = document.getElementById('favCount');
+  badge.textContent = n;
+  badge.style.display = n > 0 ? 'inline' : 'none';
+}
+
+function renderFavoris() {
+  const list = getFavoris();
+  const container = document.getElementById('favorisList');
+  if (!list.length) {
+    container.innerHTML = `<div class="fav-empty">
+      <span class="fav-empty-icon">❤️</span>
+      Aucun favori pour l'instant.<br>
+      Analyse un véhicule et appuie sur<br><strong style="color:var(--text)">"Sauvegarder en favori"</strong> pour le retrouver ici.
+    </div>`;
+    return;
+  }
+  const scoreLabel = s => s === 0 ? 'Bon prix' : s === 1 ? 'Prix élevé' : 'Trop cher';
+  const kmLabel = s => s === 0 ? 'Km OK' : s === 1 ? 'Km élevé' : 'Km très élevé';
+  container.innerHTML = list.map(f => `
+    <div class="fav-card">
+      <div class="fav-card-top">
+        <div class="fav-card-title">${f.label}</div>
+        <button class="fav-card-delete" onclick="deleteFavori('${f.id}')" title="Supprimer">✕</button>
+      </div>
+      <div class="fav-card-meta">
+        <span class="fav-meta-chip">💶 ${Number(f.prix).toLocaleString('fr')}€</span>
+        <span class="fav-meta-chip">📍 ${Number(f.km).toLocaleString('fr')} km</span>
+        <span class="fav-meta-chip">📅 ${f.annee}</span>
+        <span class="fav-score ${f.clsPrix}">${scoreLabel(f.scorePrix)}</span>
+        <span class="fav-score ${f.clsKm}">${kmLabel(f.scoreKm)}</span>
+      </div>
+      <div class="fav-card-date">Enregistré le ${f.savedAt}</div>
+      <button class="btn-reanalyze" onclick="reanalyze('${f.id}')">🔍 Ré-analyser ce véhicule</button>
+    </div>`).join('');
+}
+
+function reanalyze(id) {
+  const fav = getFavoris().find(f => f.id === id);
+  if (!fav) return;
+  switchView('analyser');
+  document.getElementById('modele').value = fav.modeleKey;
+  onModeleChange();
+  if (fav.modeleKey === 'autre') document.getElementById('autreNom').value = fav.label;
+  document.getElementById('prix').value = fav.prix;
+  document.getElementById('km').value = fav.km;
+  setAnnee(fav.annee, document.querySelector(`.seg-btn[onclick="setAnnee(${fav.annee},this)"]`) || document.querySelector('.seg-btn'));
+  state.vendeur = fav.vendeur || 'pro';
+  state.garantie = fav.garantie || 6;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => analyser(), 100);
+}
+
+function switchView(view) {
+  const isAnalyse = view === 'analyser';
+  document.getElementById('formSection').style.display = isAnalyse ? 'block' : 'none';
+  document.getElementById('favorisSection').style.display = isAnalyse ? 'none' : 'block';
+  document.getElementById('rapport').classList.remove('show');
+  document.getElementById('rapport').innerHTML = '';
+  document.getElementById('tabAnalyser').classList.toggle('active', isAnalyse);
+  document.getElementById('tabFavoris').classList.toggle('active', !isAnalyse);
+  if (!isAnalyse) renderFavoris();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 loadCustomModels();
+updateFavCount();
 
 function recommencer() {
   document.getElementById('rapport').classList.remove('show');
   document.getElementById('rapport').innerHTML = '';
   document.getElementById('formSection').style.display = 'block';
+  document.getElementById('tabNav').style.display = 'flex';
+  document.getElementById('tabAnalyser').classList.add('active');
+  document.getElementById('tabFavoris').classList.remove('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
