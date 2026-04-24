@@ -629,7 +629,8 @@ select {
   <!-- TAB NAV -->
   <div class="tab-nav" id="tabNav">
     <button class="tab-btn active" id="tabAnalyser" onclick="switchView('analyser')">🔍 Analyser</button>
-    <button class="tab-btn" id="tabFavoris" onclick="switchView('favoris')">❤️ Mes favoris <span class="tab-badge" id="favCount" style="display:none">0</span></button>
+    <button class="tab-btn" id="tabFavoris" onclick="switchView('favoris')">❤️ Favoris <span class="tab-badge" id="favCount" style="display:none">0</span></button>
+    <button class="tab-btn" id="tabHistorique" onclick="switchView('historique')">📋 Historique</button>
   </div>
 
   <!-- FORM -->
@@ -769,6 +770,11 @@ select {
   <!-- FAVORIS -->
   <div id="favorisSection" style="display:none">
     <div id="favorisList"></div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div id="historiqueSection" style="display:none">
+    <div id="historiqueList"></div>
   </div>
 
   <!-- RAPPORT -->
@@ -1809,6 +1815,13 @@ function analyser() {
       </div>
     `;
 
+    saveHistorique({
+      modele_key: modeleKey, label: nomModele,
+      prix, km, annee, vendeur, garantie,
+      verdict: v.cls,
+      analysed_at: new Date().toISOString()
+    });
+
     rapport.classList.add('show');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -1821,51 +1834,70 @@ function copyScript(el) {
 }
 
 // ─────────────────────────────────────────────
-// FAVORIS
+// API HELPERS
 // ─────────────────────────────────────────────
-function getFavoris() {
-  return JSON.parse(localStorage.getItem('favoris') || '[]');
+async function apiFetch(path, opts = {}) {
+  try {
+    const r = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    if (r.status === 204) return null;
+    return await r.json();
+  } catch(e) { console.error(e); return null; }
 }
 
-function saveFavori(fav) {
-  const list = getFavoris();
-  const exists = list.find(f => f.modeleKey === fav.modeleKey && f.prix === fav.prix && f.km === fav.km);
-  if (exists) { showToast('Déjà dans tes favoris'); return; }
-  list.unshift({ ...fav, id: Date.now().toString(), savedAt: new Date().toISOString().slice(0,10) });
-  localStorage.setItem('favoris', JSON.stringify(list));
-  updateFavCount();
-  showToast('❤️ Ajouté aux favoris');
-  document.getElementById('btnSaveFav').classList.add('saved');
-  document.getElementById('btnSaveFav').textContent = '✓ Sauvegardé dans mes favoris';
+// ─────────────────────────────────────────────
+// FAVORIS (Supabase via /api/favoris)
+// ─────────────────────────────────────────────
+async function saveFavori(fav) {
+  const btn = document.getElementById('btnSaveFav');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sauvegarde…';
+  const payload = {
+    modele_key: fav.modeleKey, label: fav.label,
+    prix: fav.prix, km: fav.km, annee: fav.annee,
+    vendeur: fav.vendeur, garantie: fav.garantie,
+    score_prix: fav.scorePrix, cls_prix: fav.clsPrix,
+    score_km: fav.scoreKm, cls_km: fav.clsKm
+  };
+  const res = await apiFetch('/api/favoris', { method: 'POST', body: JSON.stringify(payload) });
+  if (res) {
+    showToast('❤️ Ajouté aux favoris');
+    btn.classList.add('saved');
+    btn.textContent = '✓ Sauvegardé dans mes favoris';
+    updateFavCount();
+  } else {
+    btn.disabled = false;
+    btn.textContent = '❤️ Sauvegarder en favori';
+    showToast('Erreur — vérifie la config Supabase');
+  }
 }
 
-function deleteFavori(id) {
-  const list = getFavoris().filter(f => f.id !== id);
-  localStorage.setItem('favoris', JSON.stringify(list));
+async function deleteFavori(id) {
+  await apiFetch(`/api/favoris?id=${id}`, { method: 'DELETE' });
   updateFavCount();
   renderFavoris();
 }
 
-function updateFavCount() {
-  const n = getFavoris().length;
+async function updateFavCount() {
+  const list = await apiFetch('/api/favoris') || [];
   const badge = document.getElementById('favCount');
-  badge.textContent = n;
-  badge.style.display = n > 0 ? 'inline' : 'none';
+  badge.textContent = list.length;
+  badge.style.display = list.length > 0 ? 'inline' : 'none';
 }
 
-function renderFavoris() {
-  const list = getFavoris();
+async function renderFavoris() {
   const container = document.getElementById('favorisList');
+  container.innerHTML = `<div class="fav-empty"><span class="fav-empty-icon" style="font-size:24px">⏳</span>Chargement…</div>`;
+  const list = await apiFetch('/api/favoris') || [];
   if (!list.length) {
     container.innerHTML = `<div class="fav-empty">
       <span class="fav-empty-icon">❤️</span>
       Aucun favori pour l'instant.<br>
-      Analyse un véhicule et appuie sur<br><strong style="color:var(--text)">"Sauvegarder en favori"</strong> pour le retrouver ici.
+      Analyse un véhicule et appuie sur<br><strong style="color:var(--text)">"Sauvegarder en favori"</strong>.
     </div>`;
     return;
   }
   const scoreLabel = s => s === 0 ? 'Bon prix' : s === 1 ? 'Prix élevé' : 'Trop cher';
-  const kmLabel = s => s === 0 ? 'Km OK' : s === 1 ? 'Km élevé' : 'Km très élevé';
+  const kmLabel   = s => s === 0 ? 'Km OK'    : s === 1 ? 'Km élevé'  : 'Km très élevé';
   container.innerHTML = list.map(f => `
     <div class="fav-card">
       <div class="fav-card-top">
@@ -1876,39 +1908,94 @@ function renderFavoris() {
         <span class="fav-meta-chip">💶 ${Number(f.prix).toLocaleString('fr')}€</span>
         <span class="fav-meta-chip">📍 ${Number(f.km).toLocaleString('fr')} km</span>
         <span class="fav-meta-chip">📅 ${f.annee}</span>
-        <span class="fav-score ${f.clsPrix}">${scoreLabel(f.scorePrix)}</span>
-        <span class="fav-score ${f.clsKm}">${kmLabel(f.scoreKm)}</span>
+        <span class="fav-score ${f.cls_prix}">${scoreLabel(f.score_prix)}</span>
+        <span class="fav-score ${f.cls_km}">${kmLabel(f.score_km)}</span>
       </div>
-      <div class="fav-card-date">Enregistré le ${f.savedAt}</div>
-      <button class="btn-reanalyze" onclick="reanalyze('${f.id}')">🔍 Ré-analyser ce véhicule</button>
+      <div class="fav-card-date">Enregistré le ${f.saved_at ? f.saved_at.slice(0,10) : '—'}</div>
+      <button class="btn-reanalyze" onclick="reanalyzeFromData(${JSON.stringify(f).replace(/"/g,'&quot;')})">🔍 Ré-analyser</button>
     </div>`).join('');
 }
 
-function reanalyze(id) {
-  const fav = getFavoris().find(f => f.id === id);
-  if (!fav) return;
+// ─────────────────────────────────────────────
+// HISTORIQUE (Supabase via /api/historique)
+// ─────────────────────────────────────────────
+async function saveHistorique(data) {
+  await apiFetch('/api/historique', { method: 'POST', body: JSON.stringify(data) });
+}
+
+async function deleteHistorique(id) {
+  await apiFetch(`/api/historique?id=${id}`, { method: 'DELETE' });
+  renderHistorique();
+}
+
+async function clearHistorique() {
+  if (!confirm('Effacer tout l\'historique ?')) return;
+  await apiFetch('/api/historique?id=all', { method: 'DELETE' });
+  renderHistorique();
+}
+
+async function renderHistorique() {
+  const container = document.getElementById('historiqueList');
+  container.innerHTML = `<div class="fav-empty"><span class="fav-empty-icon" style="font-size:24px">⏳</span>Chargement…</div>`;
+  const list = await apiFetch('/api/historique') || [];
+  if (!list.length) {
+    container.innerHTML = `<div class="fav-empty">
+      <span class="fav-empty-icon">📋</span>
+      Aucune analyse pour l'instant.<br>
+      Chaque analyse est automatiquement<br>enregistrée ici.
+    </div>`;
+    return;
+  }
+  const verdictStyle = v => v === 'ok' ? 'color:var(--accent)' : v === 'warn' ? 'color:var(--warn)' : 'color:var(--bad)';
+  const verdictLabel = v => v === 'ok' ? '✅ Acceptable' : v === 'warn' ? '⚠️ À renégocier' : '🚫 À refuser';
+  container.innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button onclick="clearHistorique()" style="background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:var(--radius);cursor:pointer">🗑 Tout effacer</button>
+    </div>` +
+  list.map(h => `
+    <div class="fav-card">
+      <div class="fav-card-top">
+        <div>
+          <div class="fav-card-title">${h.label}</div>
+          <div style="font-size:11px;margin-top:3px;${verdictStyle(h.verdict)}">${verdictLabel(h.verdict)}</div>
+        </div>
+        <button class="fav-card-delete" onclick="deleteHistorique('${h.id}')" title="Supprimer">✕</button>
+      </div>
+      <div class="fav-card-meta">
+        <span class="fav-meta-chip">💶 ${Number(h.prix).toLocaleString('fr')}€</span>
+        <span class="fav-meta-chip">📍 ${Number(h.km).toLocaleString('fr')} km</span>
+        <span class="fav-meta-chip">📅 ${h.annee}</span>
+      </div>
+      <div class="fav-card-date">${h.analysed_at ? new Date(h.analysed_at).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+      <button class="btn-reanalyze" onclick="reanalyzeFromData(${JSON.stringify(h).replace(/"/g,'&quot;')})">🔍 Ré-analyser</button>
+    </div>`).join('');
+}
+
+function reanalyzeFromData(d) {
   switchView('analyser');
-  document.getElementById('modele').value = fav.modeleKey;
+  const key = d.modele_key || d.modeleKey;
+  document.getElementById('modele').value = key;
   onModeleChange();
-  if (fav.modeleKey === 'autre') document.getElementById('autreNom').value = fav.label;
-  document.getElementById('prix').value = fav.prix;
-  document.getElementById('km').value = fav.km;
-  setAnnee(fav.annee, document.querySelector(`.seg-btn[onclick="setAnnee(${fav.annee},this)"]`) || document.querySelector('.seg-btn'));
-  state.vendeur = fav.vendeur || 'pro';
-  state.garantie = fav.garantie || 6;
+  if (key === 'autre' || key?.startsWith('custom_')) document.getElementById('autreNom').value = d.label;
+  document.getElementById('prix').value = d.prix;
+  document.getElementById('km').value = d.km;
+  const anneeBtn = document.querySelector(`.seg-btn[onclick="setAnnee(${d.annee},this)"]`);
+  if (anneeBtn) setAnnee(d.annee, anneeBtn);
+  state.vendeur = d.vendeur || 'pro';
+  state.garantie = d.garantie || 6;
   window.scrollTo({ top: 0, behavior: 'smooth' });
   setTimeout(() => analyser(), 100);
 }
 
 function switchView(view) {
-  const isAnalyse = view === 'analyser';
-  document.getElementById('formSection').style.display = isAnalyse ? 'block' : 'none';
-  document.getElementById('favorisSection').style.display = isAnalyse ? 'none' : 'block';
+  ['analyser','favoris','historique'].forEach(v => {
+    document.getElementById(v === 'analyser' ? 'formSection' : v + 'Section').style.display = v === view ? 'block' : 'none';
+    document.getElementById('tab' + v.charAt(0).toUpperCase() + v.slice(1)).classList.toggle('active', v === view);
+  });
   document.getElementById('rapport').classList.remove('show');
   document.getElementById('rapport').innerHTML = '';
-  document.getElementById('tabAnalyser').classList.toggle('active', isAnalyse);
-  document.getElementById('tabFavoris').classList.toggle('active', !isAnalyse);
-  if (!isAnalyse) renderFavoris();
+  if (view === 'favoris') renderFavoris();
+  if (view === 'historique') renderHistorique();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1922,6 +2009,7 @@ function recommencer() {
   document.getElementById('tabNav').style.display = 'flex';
   document.getElementById('tabAnalyser').classList.add('active');
   document.getElementById('tabFavoris').classList.remove('active');
+  document.getElementById('tabHistorique').classList.remove('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
