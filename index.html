@@ -550,7 +550,15 @@ select {
 
       <div id="autreNomGroup" style="display:none" class="input-group">
         <div class="input-label">Nom du modèle</div>
-        <input type="text" id="autreNom" placeholder="Ex: BYD Dolphin, Kia EV3...">
+        <input type="text" id="autreNom" placeholder="Ex: BYD Dolphin, Kia EV3..." oninput="onAutreNomInput()">
+        <div id="autreSearchBtns" style="display:none;margin-top:10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:0.08em">RECHERCHER CE MODÈLE SUR</div>
+          <div class="btn-row">
+            <a id="btnLcAutre" class="btn-lc" href="#" target="_blank" rel="noopener" style="font-size:12px;padding:10px 6px">La Centrale ↗</a>
+            <a id="btnArgusAutre" class="btn-argus" href="#" target="_blank" rel="noopener" style="font-size:12px;padding:10px 6px">L'Argus ↗</a>
+            <a id="btnLbcAutre" class="btn-lbc" href="#" target="_blank" rel="noopener" style="font-size:12px;padding:10px 6px">LeBonCoin ↗</a>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
@@ -1285,6 +1293,75 @@ function setSeg(field, val, btn) {
 function onModeleChange() {
   const v = document.getElementById('modele').value;
   document.getElementById('autreNomGroup').style.display = v === 'autre' ? 'block' : 'none';
+  if (v !== 'autre') document.getElementById('autreSearchBtns').style.display = 'none';
+}
+
+function onAutreNomInput() {
+  const nom = document.getElementById('autreNom').value.trim();
+  const btns = document.getElementById('autreSearchBtns');
+  if (nom.length < 2) { btns.style.display = 'none'; return; }
+  btns.style.display = 'block';
+  const enc = encodeURIComponent(nom);
+  const encPlus = nom.replace(/\s+/g, '+');
+  document.getElementById('btnLcAutre').href =
+    `https://www.lacentrale.fr/listing?text=${enc}&energy=ELECTRIC`;
+  document.getElementById('btnArgusAutre').href =
+    `https://www.largus.fr/voitures-occasion/annonce-voiture.html?recherche=${enc}&energie=Electrique`;
+  document.getElementById('btnLbcAutre').href =
+    `https://www.leboncoin.fr/recherche?category=2&text=${encPlus}&energy=Electrique`;
+}
+
+// ─────────────────────────────────────────────
+// MODÈLES PERSONNALISÉS (localStorage)
+// ─────────────────────────────────────────────
+function loadCustomModels() {
+  const saved = JSON.parse(localStorage.getItem('custom_models') || '[]');
+  if (!saved.length) return;
+  const select = document.getElementById('modele');
+  let grp = select.querySelector('optgroup[data-custom]');
+  if (!grp) {
+    grp = document.createElement('optgroup');
+    grp.label = '── Mes modèles ──';
+    grp.setAttribute('data-custom', '1');
+    select.insertBefore(grp, select.querySelector('optgroup[label="── Autre ──"]'));
+  }
+  grp.innerHTML = '';
+  saved.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = 'custom_' + m.key;
+    opt.textContent = m.label;
+    grp.appendChild(opt);
+    if (!MODELS['custom_' + m.key]) {
+      MODELS['custom_' + m.key] = {
+        label: m.label, min: m.min||null, max: m.max||null, cible: m.cible||null,
+        bat: null, range: null, charge_max: null, fiabilite: 'inconnue', cat: 'inconnu', longueur: '—', coffre: '—'
+      };
+      DEFAUTS['custom_' + m.key] = DEFAUTS.autre;
+      LC_KEYS['custom_' + m.key] = m.lcKey || '';
+      LBC_KEYS['custom_' + m.key] = m.lbcKey || null;
+      LARGUS_KEYS['custom_' + m.key] = null;
+    }
+  });
+}
+
+function saveCustomModel(label, lcKey, lbcKey) {
+  const key = label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  const saved = JSON.parse(localStorage.getItem('custom_models') || '[]');
+  if (saved.find(m => m.key === key)) {
+    showToast('Modèle déjà dans la liste');
+    return;
+  }
+  saved.push({ key, label, lcKey, lbcKey, addedAt: new Date().toISOString().slice(0,10) });
+  localStorage.setItem('custom_models', JSON.stringify(saved));
+  loadCustomModels();
+  showToast('✓ ' + label + ' ajouté à ta liste');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 // ─────────────────────────────────────────────
@@ -1562,6 +1639,13 @@ function analyser() {
 
       ${verifHtml ? `<div class="r-label">Checklist à vérifier sur place</div>${verifHtml}` : ''}
 
+      ${modeleKey === 'autre' && nomModele !== 'Modèle inconnu' ? `
+      <div class="r-label">Sauvegarder ce modèle</div>
+      <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--muted2);margin-bottom:10px">Ajoute <strong style="color:var(--text)">${nomModele}</strong> à ta liste pour le retrouver dans le menu déroulant la prochaine fois.</div>
+        <button class="btn-primary" style="margin-top:0" onclick="saveCustomModel('${nomModele.replace(/'/g,"\\'")}', '${nomModele.toLowerCase().replace(/\s+/g,'+')}', '${nomModele.toLowerCase().replace(/\s+/g,'+')}')">+ Ajouter "${nomModele}" à ma liste</button>
+      </div>` : ''}
+
       <button class="btn-secondary" onclick="recommencer()">← Nouvelle analyse</button>
     `;
 
@@ -1572,12 +1656,11 @@ function analyser() {
 }
 
 function copyScript(el) {
-  const text = el.textContent.trim();
-  navigator.clipboard.writeText(text).catch(() => {});
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  navigator.clipboard.writeText(el.textContent.trim()).catch(() => {});
+  showToast('Phrase copiée ✓');
 }
+
+loadCustomModels();
 
 function recommencer() {
   document.getElementById('rapport').classList.remove('show');
