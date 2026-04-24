@@ -280,7 +280,7 @@ select {
 .lc-gap.bad { color: var(--bad); background: var(--bad-dim); border-color: rgba(255,77,109,0.2); }
 
 .btn-row { display: flex; gap: 8px; }
-.btn-lc, .btn-argus {
+.btn-lc, .btn-argus, .btn-lbc {
   flex: 1;
   display: flex;
   align-items: center;
@@ -300,6 +300,7 @@ select {
 }
 .btn-lc { background: #e8380d; }
 .btn-argus { background: #1a3a6b; }
+.btn-lbc { background: #f56b2a; }
 .btn-lc:hover, .btn-argus:hover { opacity: 0.88; }
 .btn-lc svg, .btn-argus svg { flex-shrink: 0; }
 
@@ -1218,6 +1219,29 @@ const LC_KEYS = {
   autre:''
 };
 
+const LBC_KEYS = {
+  megane60:'renault+m%C3%A9gane+e-tech', megane40:'renault+m%C3%A9gane+e-tech',
+  id3_58:'volkswagen+id.3', id3_77:'volkswagen+id.3',
+  born_58:'cupra+born', born_77:'cupra+born',
+  mg4_49:'mg+mg4', mg4_64:'mg+mg4', mg4_77:'mg+mg4',
+  e308:'peugeot+e-308', astra_e:'opel+astra+%C3%A9lectrique', ec4:'citro%C3%ABn+%C3%AB-c4',
+  model3_sr:'tesla+model+3', model3_lr:'tesla+model+3+grande+autonomie', model3_perf:'tesla+model+3+performance',
+  i4_40:'bmw+i4',
+  ioniq6_53:'hyundai+ioniq+6', ioniq6_77:'hyundai+ioniq+6',
+  id7:'volkswagen+id.7',
+  inster_42:'hyundai+inster', inster_49:'hyundai+inster',
+  r5_40:'renault+r5+e-tech', r5_52:'renault+r5+e-tech',
+  e208_50:'peugeot+e-208', leaf_40:'nissan+leaf',
+  zoe_52:'renault+zo%C3%A9', spring:'dacia+spring',
+  fiat500e_24:'fiat+500e', fiat500e_42:'fiat+500e',
+  ec3:'citro%C3%ABn+%C3%AB-c3', e2008:'peugeot+e-2008',
+  id4_77:'volkswagen+id.4', id5_77:'volkswagen+id.5',
+  enyaq_60:'skoda+enyaq', enyaq_80:'skoda+enyaq',
+  ev6_sr:'kia+ev6', ev6_lr:'kia+ev6',
+  q4_40:'audi+q4+e-tron', ix1:'bmw+ix1', eqa_250:'mercedes+eqa',
+  autre:null
+};
+
 const LARGUS_KEYS = {
   megane60:{ ma:'RENAULT', mo:'MEGANE+E-TECH' }, megane40:{ ma:'RENAULT', mo:'MEGANE+E-TECH' },
   id3_58:{ ma:'VOLKSWAGEN', mo:'ID.3' }, id3_77:{ ma:'VOLKSWAGEN', mo:'ID.3' },
@@ -1297,6 +1321,12 @@ function buildLargusUrl(modeleKey, pMin, pMax) {
   const k = LARGUS_KEYS[modeleKey];
   if (!k) return null;
   return `https://www.largus.fr/voitures-occasion/annonce-voiture.html?marque=${k.ma}&modele=${k.mo}&energie=Electrique&prix_min=${Math.round(pMin)}&prix_max=${Math.round(pMax)}`;
+}
+
+function buildLbcUrl(modeleKey, pMin, pMax) {
+  const k = LBC_KEYS[modeleKey];
+  if (!k) return null;
+  return `https://www.leboncoin.fr/recherche?category=2&text=${k}&energy=Electrique&price=${Math.round(pMin)}-${Math.round(pMax)}`;
 }
 
 // ─────────────────────────────────────────────
@@ -1400,9 +1430,11 @@ function analyser() {
     const extIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
     const lcUrl = ref.min ? buildLcUrl(modeleKey, ref.min * 0.9, ref.max * 1.1) : null;
     const largusUrl = ref.min ? buildLargusUrl(modeleKey, ref.min * 0.9, ref.max * 1.1) : null;
-    const lcBtnHtml = (lcUrl || largusUrl) ? `<div class="btn-row">
-      ${lcUrl ? `<a class="btn-lc" href="${lcUrl}" target="_blank" rel="noopener">🔍 La Centrale ${extIcon}</a>` : ''}
-      ${largusUrl ? `<a class="btn-argus" href="${largusUrl}" target="_blank" rel="noopener">🔍 L'Argus ${extIcon}</a>` : ''}
+    const lbcUrl = ref.min ? buildLbcUrl(modeleKey, ref.min * 0.9, ref.max * 1.1) : null;
+    const lcBtnHtml = (lcUrl || largusUrl || lbcUrl) ? `<div class="btn-row">
+      ${lcUrl ? `<a class="btn-lc" href="${lcUrl}" target="_blank" rel="noopener">La Centrale ${extIcon}</a>` : ''}
+      ${largusUrl ? `<a class="btn-argus" href="${largusUrl}" target="_blank" rel="noopener">L'Argus ${extIcon}</a>` : ''}
+      ${lbcUrl ? `<a class="btn-lbc" href="${lbcUrl}" target="_blank" rel="noopener">LeBonCoin ${extIcon}</a>` : ''}
     </div>` : '';
 
     // Rappels critiques
