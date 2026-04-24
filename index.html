@@ -279,27 +279,29 @@ select {
 .lc-gap.warn { color: var(--warn); background: var(--warn-dim); border-color: rgba(255,184,0,0.2); }
 .lc-gap.bad { color: var(--bad); background: var(--bad-dim); border-color: rgba(255,77,109,0.2); }
 
-.btn-lc {
+.btn-row { display: flex; gap: 8px; }
+.btn-lc, .btn-argus {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 13px;
-  background: #e8380d;
+  gap: 6px;
+  padding: 13px 8px;
   border: none;
   border-radius: var(--radius);
   color: #fff;
   font-family: var(--display);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   cursor: pointer;
   text-decoration: none;
   transition: opacity 0.2s;
 }
-.btn-lc:hover { opacity: 0.88; }
-.btn-lc svg { flex-shrink: 0; }
+.btn-lc { background: #e8380d; }
+.btn-argus { background: #1a3a6b; }
+.btn-lc:hover, .btn-argus:hover { opacity: 0.88; }
+.btn-lc svg, .btn-argus svg { flex-shrink: 0; }
 
 /* ── STAT CARDS ── */
 .stats-row { display: flex; gap: 10px; margin-bottom: 16px; }
@@ -508,6 +510,18 @@ select {
             <option value="model3_lr">Tesla Model 3 Grande Autonomie</option>
             <option value="model3_perf">Tesla Model 3 Performance</option>
           </optgroup>
+          <optgroup label="── SUV / Crossovers ──">
+            <option value="e2008">Peugeot e-2008 50 kWh</option>
+            <option value="id4_77">VW ID.4 Pro 77 kWh</option>
+            <option value="id5_77">VW ID.5 Pro 77 kWh</option>
+            <option value="enyaq_60">Skoda Enyaq iV 60</option>
+            <option value="enyaq_80">Skoda Enyaq iV 80</option>
+            <option value="ev6_sr">Kia EV6 Standard Range</option>
+            <option value="ev6_lr">Kia EV6 Long Range AWD</option>
+            <option value="q4_40">Audi Q4 e-tron 40</option>
+            <option value="ix1">BMW iX1 xDrive30</option>
+            <option value="eqa_250">Mercedes EQA 250</option>
+          </optgroup>
           <optgroup label="── Berlines premium ──">
             <option value="i4_40">BMW i4 eDrive40</option>
             <option value="ioniq6_53">Hyundai Ioniq 6 53 kWh</option>
@@ -515,6 +529,9 @@ select {
             <option value="id7">VW ID.7 77 kWh</option>
           </optgroup>
           <optgroup label="── Citadines ──">
+            <option value="fiat500e_24">Fiat 500e 24 kWh</option>
+            <option value="fiat500e_42">Fiat 500e 42 kWh</option>
+            <option value="ec3">Citroën ë-C3 44 kWh</option>
             <option value="inster_42">Hyundai Inster 42 kWh</option>
             <option value="inster_49">Hyundai Inster 49 kWh LR</option>
             <option value="r5_40">Renault R5 E-Tech 40 kWh</option>
@@ -633,6 +650,19 @@ const MODELS = {
   leaf_40:    { label:'Nissan Leaf 40 kWh', min:9000, max:18000, cible:13000, bat:40, range:180, charge_max:50, fiabilite:'très bonne', cat:'compacte', longueur:'4.49m', coffre:'435L' },
   zoe_52:     { label:'Renault Zoé ZE50', min:8000, max:16000, cible:11000, bat:52, range:250, charge_max:50, fiabilite:'bonne', cat:'citadine', longueur:'4.09m', coffre:'338L' },
   spring:     { label:'Dacia Spring', min:6000, max:12000, cible:8500, bat:26.8, range:160, charge_max:30, fiabilite:'bonne', cat:'citadine', longueur:'3.73m', coffre:'270L' },
+  fiat500e_24:{ label:'Fiat 500e 24 kWh', min:10000, max:17000, cible:13000, bat:24, range:150, charge_max:50, fiabilite:'bonne', cat:'citadine', longueur:'3.63m', coffre:'185L' },
+  fiat500e_42:{ label:'Fiat 500e 42 kWh', min:15000, max:22000, cible:18000, bat:42, range:280, charge_max:85, fiabilite:'bonne', cat:'citadine', longueur:'3.63m', coffre:'185L' },
+  ec3:        { label:'Citroën ë-C3 44 kWh', min:14000, max:20000, cible:17000, bat:44, range:280, charge_max:100, fiabilite:'inconnue', cat:'citadine', longueur:'4.01m', coffre:'310L' },
+  e2008:      { label:'Peugeot e-2008 50 kWh', min:18000, max:27000, cible:22000, bat:50, range:290, charge_max:100, fiabilite:'bonne', cat:'suv', longueur:'4.30m', coffre:'434L' },
+  id4_77:     { label:'VW ID.4 Pro 77 kWh', min:28000, max:42000, cible:34000, bat:77, range:400, charge_max:135, fiabilite:'bonne', cat:'suv', longueur:'4.58m', coffre:'543L' },
+  id5_77:     { label:'VW ID.5 Pro 77 kWh', min:30000, max:44000, cible:37000, bat:77, range:390, charge_max:135, fiabilite:'bonne', cat:'suv', longueur:'4.60m', coffre:'549L' },
+  enyaq_60:   { label:'Skoda Enyaq iV 60', min:22000, max:33000, cible:27000, bat:58, range:340, charge_max:120, fiabilite:'bonne', cat:'suv', longueur:'4.65m', coffre:'585L' },
+  enyaq_80:   { label:'Skoda Enyaq iV 80', min:27000, max:39000, cible:32000, bat:77, range:430, charge_max:135, fiabilite:'bonne', cat:'suv', longueur:'4.65m', coffre:'585L' },
+  ev6_sr:     { label:'Kia EV6 Standard Range', min:27000, max:37000, cible:31000, bat:58, range:360, charge_max:350, fiabilite:'très bonne', cat:'suv', longueur:'4.68m', coffre:'490L' },
+  ev6_lr:     { label:'Kia EV6 Long Range AWD', min:34000, max:46000, cible:39000, bat:77, range:450, charge_max:350, fiabilite:'très bonne', cat:'suv', longueur:'4.68m', coffre:'490L' },
+  q4_40:      { label:'Audi Q4 e-tron 40', min:30000, max:43000, cible:36000, bat:77, range:400, charge_max:135, fiabilite:'bonne', cat:'suv', longueur:'4.59m', coffre:'520L' },
+  ix1:        { label:'BMW iX1 xDrive30', min:35000, max:50000, cible:42000, bat:64, range:360, charge_max:130, fiabilite:'bonne', cat:'suv', longueur:'4.50m', coffre:'490L' },
+  eqa_250:    { label:'Mercedes EQA 250', min:27000, max:38000, cible:31000, bat:66, range:350, charge_max:100, fiabilite:'bonne', cat:'suv', longueur:'4.46m', coffre:'340L' },
   autre:      { label:'Modèle non listé', min:null, max:null, cible:null, bat:null, range:null, charge_max:null, fiabilite:'inconnue', cat:'inconnu', longueur:'—', coffre:'—' }
 };
 
@@ -984,6 +1014,170 @@ const DEFAUTS = {
     rappels:[],
     verifications:['Vérifier présence charge DC (option payante)','Confirmer kilométrage et SoH','Évaluer autonomie affichée à froid']
   },
+  fiat500e_24: {
+    gravite:'modérée',
+    defauts:[
+      { niveau:'élevé', titre:'Autonomie réelle très limitée', detail:'24 kWh = 130–150 km réels. Véhicule strictement urbain. Pour tout trajet > 100 km, des pauses s\'imposent.' },
+      { niveau:'moyen', titre:'Charge DC limitée à 50 kW', detail:'50 kW max en DC — recharge lente sur autoroute. Prévu uniquement pour usage citadin.' },
+      { niveau:'faible', titre:'Coffre 185 L — très contraint', detail:'Le plus petit coffre du marché. Usage pratiquement limité à l\'urbain sans bagages.' },
+    ],
+    nego:[
+      { axe:'Usage strictement urbain', script:'"Avec 150 km d\'autonomie réelle, cette 500e 24 kWh ne peut pas faire de longs trajets. C\'est un véhicule de ville uniquement — le prix doit le refléter."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Tester charge DC','Confirmer usage adapté']
+  },
+  fiat500e_42: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Coffre 185 L — insuffisant', detail:'Malgré la batterie plus grande, le coffre reste minuscule. Contraignant dès qu\'on a des bagages.' },
+      { niveau:'faible', titre:'Charge DC 85 kW correcte', detail:'85 kW en DC : acceptable. 10–80% en ~25 min sur borne rapide.' },
+    ],
+    nego:[
+      { axe:'Coffre trop petit', script:'"185 L de coffre c\'est insuffisant dès qu\'on a des courses. Ce défaut structurel doit baisser le prix par rapport à une e-208 ou une R5."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Tester charge DC 85 kW','Contrôler état carrosserie (acier, rouille possible)']
+  },
+  ec3: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Recul fiabilité très limité', detail:'L\'ë-C3 est commercialisée fin 2024 — quasiment aucun retour terrain disponible sur la fiabilité.' },
+      { niveau:'faible', titre:'Finitions intérieures basiques', detail:'Positionnée entrée de gamme — plastiques durs et équipements limités sur les premières finitions.' },
+    ],
+    nego:[
+      { axe:'Modèle trop récent', script:'"L\'ë-C3 n\'a aucun recul fiabilité. Sans garantie 12 mois, je ne prends pas le risque."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Vérifier garantie constructeur restante','Tester interface multimédia']
+  },
+  e2008: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Charge DC limitée à 100 kW', detail:'100 kW max en DC — identique à la e-308. Derrière les SUV concurrents (EV6 : 350 kW).' },
+      { niveau:'moyen', titre:'Pas de pompe à chaleur de série', detail:'La PAC n\'est pas systématique selon les finitions. Sans elle, autonomie hiver réduite de 25–30%.' },
+      { niveau:'faible', titre:'Autonomie WLTP surestimée', detail:'~290 km réels contre 406 km WLTP. Usage mixte confortable, autoroute limitant.' },
+    ],
+    nego:[
+      { axe:'PAC absente', script:'"Pas de pompe à chaleur sur cette e-2008. En hiver ça représente 25% d\'autonomie en moins — je veux 700€ de remise."' },
+      { axe:'Charge DC lente', script:'"100 kW DC c\'est en dessous de la concurrence. Pour ce prix je peux avoir un EV6 qui charge à 350 kW."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier présence PAC','Tester charge DC','SoH batterie']
+  },
+  id4_77: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Charge DC limitée à 135 kW', detail:'Correct mais inférieur aux EV6/Ioniq 5 (350 kW). Les pauses autoroute sont plus longues.' },
+      { niveau:'moyen', titre:'Bugs logiciels (plateforme MEB)', detail:'Mêmes problèmes de navigation et connectivité que l\'ID.3. Le restylage 2023 améliore la situation.' },
+      { niveau:'faible', titre:'Poids élevé (2 100 kg)', detail:'Consommation réelle plus haute que les données WLTP en usage chargé ou autoroute.' },
+    ],
+    nego:[
+      { axe:'Prix de marché', script:'"Les ID.4 77 kWh de cet âge se trouvent à [X€] sur La Centrale et L\'Argus. Alignez-vous sur le marché."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Confirmer PAC présente','Tester logiciel à jour']
+  },
+  id5_77: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Même plateforme que l\'ID.4', detail:'Bugs logiciels identiques possibles. Vérifiez la version logicielle et les mises à jour effectuées.' },
+      { niveau:'faible', titre:'Coffre moins accessible', detail:'Le design coupé réduit l\'accessibilité du coffre malgré un volume similaire à l\'ID.4.' },
+    ],
+    nego:[
+      { axe:'Design coupé — valeur résiduelle', script:'"Le design coupé plaît moins que l\'ID.4 classique à la revente. Je veux un prix aligné sur le marché réel."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie 77 kWh','Tester logiciel','Confirmer PAC installée']
+  },
+  enyaq_60: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Même plateforme VW MEB', detail:'Bugs logiciels possibles identiques à l\'ID.4/ID.3. Version logicielle à vérifier.' },
+      { niveau:'faible', titre:'Charge DC 120 kW correcte', detail:'Acceptable pour usage mixte. Pause 10–80% en ~28 min.' },
+    ],
+    nego:[
+      { axe:'Plateforme MEB', script:'"L\'Enyaq partage la plateforme ID.4 — mêmes risques de bugs logiciels. Je veux une garantie 12 mois incluse."' },
+    ],
+    rappels:[],
+    verifications:['Vérifier SoH batterie','Confirmer PAC présente','Tester logiciel navigation']
+  },
+  enyaq_80: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Prix occasion parfois surévalué', detail:'L\'Enyaq 80 est prisée — certains vendeurs profitent de la demande. Comparez avec La Centrale et L\'Argus.' },
+      { niveau:'faible', titre:'Poids 2 200 kg', detail:'Consommation réelle 18–20 kWh/100 km en usage mixte — autonomie réelle ~380–400 km.' },
+    ],
+    nego:[
+      { axe:'Prix élevé', script:'"Les Enyaq 80 se trouvent à [X€] sur L\'Argus et La Centrale. Votre prix est au-dessus — alignez-vous."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie 77 kWh','Vérifier PAC','Tester charge DC 135 kW']
+  },
+  ev6_sr: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Charge DC 800V — dépend des bornes', detail:'350 kW théorique mais les bornes 350 kW restent rares en France. En pratique : ~100–150 kW sur la plupart des bornes.' },
+      { niveau:'faible', titre:'Design polarisant', detail:'La silhouette fastback peut limiter la clientèle à la revente.' },
+    ],
+    nego:[
+      { axe:'Prix SR vs LR', script:'"Pour l\'écart de prix entre le SR et le LR, je peux avoir beaucoup plus d\'autonomie. Faites un effort ou je cherche le LR."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Tester charge DC sur borne disponible','Vérifier compte Kia pour SoH']
+  },
+  ev6_lr: {
+    gravite:'très faible',
+    defauts:[
+      { niveau:'moyen', titre:'Prix occasion élevé', detail:'L\'EV6 LR est très demandée — peu de remises accordées. Comparez impérativement avec La Centrale et L\'Argus.' },
+      { niveau:'faible', titre:'Poids 2 200 kg (AWD)', detail:'La version AWD consomme davantage — autonomie réelle ~400 km vs 450 km WLTP.' },
+    ],
+    nego:[
+      { axe:'Prix marché', script:'"Les EV6 LR AWD se trouvent à [X€] sur La Centrale. Si vous êtes au-dessus du marché, je regarde les Ioniq 6 qui chargent aussi à 350 kW."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie 77 kWh','Test charge 800V DC','Vérifier rapport entretien']
+  },
+  q4_40: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Plateforme MEB (VW Group)', detail:'Mêmes bugs logiciels potentiels que l\'ID.4 et l\'Enyaq. Vérifiez la version logicielle.' },
+      { niveau:'moyen', titre:'Charge DC 135 kW — correct mais pas excellent', detail:'Moins rapide que les Hyundai/Kia (350 kW). Pause 10–80% en ~28 min.' },
+      { niveau:'faible', titre:'Prix premium pour une plateforme partagée', detail:'L\'Audi badge coûte plus cher que l\'ID.4 ou l\'Enyaq sur la même base technique.' },
+    ],
+    nego:[
+      { axe:'Surcoût badge Audi', script:'"Techniquement c\'est la même plateforme qu\'un ID.4 ou Enyaq moins chers. Le badge Audi ne justifie pas [X€] d\'écart — je veux un alignement sur le marché."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Confirmer PAC installée','Vérifier logiciel à jour']
+  },
+  ix1: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Charge DC limitée à 130 kW', detail:'En dessous de la concurrence premium (EQA, Q4). Pause 10–80% en ~29 min.' },
+      { niveau:'moyen', titre:'Coffre 490 L — correct mais pas généreux', detail:'Pour un SUV premium BMW, certains attendaient plus.' },
+      { niveau:'faible', titre:'Prix occasion élevé', detail:'La demande forte maintient les prix hauts. Peu de marge de négociation habituelle.' },
+    ],
+    nego:[
+      { axe:'Prix du marché', script:'"Les iX1 de cet âge et kilométrage se trouvent à [X€] sur La Centrale. Je ne signe pas au-dessus du marché."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Vérifier historique entretien BMW','Tester suspension adaptative si présente']
+  },
+  eqa_250: {
+    gravite:'faible',
+    defauts:[
+      { niveau:'moyen', titre:'Charge DC limitée à 100 kW', detail:'100 kW en DC — le plus lent de sa catégorie. Longs trajets contraignants, pause ~35 min pour 10–80%.' },
+      { niveau:'moyen', titre:'Autonomie réelle décevante', detail:'~300–330 km réels contre 426 km WLTP. L\'EQA est gourmande à allure soutenue.' },
+      { niveau:'faible', titre:'Coffre 340 L — petit pour un SUV', detail:'Inférieur à la concurrence (Q4: 520 L, ID.4: 543 L).' },
+    ],
+    nego:[
+      { axe:'Charge DC lente', script:'"100 kW en charge DC c\'est le moins bon de la catégorie. Un EV6 charge à 350 kW pour le même prix en occasion. Je veux un geste."' },
+      { axe:'Autonomie réelle', script:'"330 km réels pour un SUV premium Mercedes, c\'est décevant. Ce n\'est pas le prix d\'un véhicule sans contrainte."' },
+    ],
+    rappels:[],
+    verifications:['SoH batterie','Tester charge DC','Vérifier présence PAC']
+  },
   autre: {
     gravite:'inconnue',
     defauts:[
@@ -1015,7 +1209,36 @@ const LC_KEYS = {
   r5_40:'renault-r5', r5_52:'renault-r5',
   e208_50:'peugeot-e-208', leaf_40:'nissan-leaf',
   zoe_52:'renault-zoe', spring:'dacia-spring',
+  fiat500e_24:'fiat-500', fiat500e_42:'fiat-500',
+  ec3:'citroen-c3', e2008:'peugeot-e-2008',
+  id4_77:'volkswagen-id-4', id5_77:'volkswagen-id-5',
+  enyaq_60:'skoda-enyaq', enyaq_80:'skoda-enyaq',
+  ev6_sr:'kia-ev6', ev6_lr:'kia-ev6',
+  q4_40:'audi-q4-e-tron', ix1:'bmw-ix1', eqa_250:'mercedes-benz-eqa',
   autre:''
+};
+
+const LARGUS_KEYS = {
+  megane60:{ ma:'RENAULT', mo:'MEGANE+E-TECH' }, megane40:{ ma:'RENAULT', mo:'MEGANE+E-TECH' },
+  id3_58:{ ma:'VOLKSWAGEN', mo:'ID.3' }, id3_77:{ ma:'VOLKSWAGEN', mo:'ID.3' },
+  born_58:{ ma:'CUPRA', mo:'BORN' }, born_77:{ ma:'CUPRA', mo:'BORN' },
+  mg4_49:{ ma:'MG', mo:'MG4' }, mg4_64:{ ma:'MG', mo:'MG4' }, mg4_77:{ ma:'MG', mo:'MG4' },
+  e308:{ ma:'PEUGEOT', mo:'308' }, astra_e:{ ma:'OPEL', mo:'ASTRA' }, ec4:{ ma:'CITROEN', mo:'C4' },
+  model3_sr:{ ma:'TESLA', mo:'MODEL+3' }, model3_lr:{ ma:'TESLA', mo:'MODEL+3' }, model3_perf:{ ma:'TESLA', mo:'MODEL+3' },
+  i4_40:{ ma:'BMW', mo:'I4' },
+  ioniq6_53:{ ma:'HYUNDAI', mo:'IONIQ+6' }, ioniq6_77:{ ma:'HYUNDAI', mo:'IONIQ+6' },
+  id7:{ ma:'VOLKSWAGEN', mo:'ID.7' },
+  inster_42:{ ma:'HYUNDAI', mo:'INSTER' }, inster_49:{ ma:'HYUNDAI', mo:'INSTER' },
+  r5_40:{ ma:'RENAULT', mo:'R5' }, r5_52:{ ma:'RENAULT', mo:'R5' },
+  e208_50:{ ma:'PEUGEOT', mo:'208' }, leaf_40:{ ma:'NISSAN', mo:'LEAF' },
+  zoe_52:{ ma:'RENAULT', mo:'ZOE' }, spring:{ ma:'DACIA', mo:'SPRING' },
+  fiat500e_24:{ ma:'FIAT', mo:'500+E' }, fiat500e_42:{ ma:'FIAT', mo:'500+E' },
+  ec3:{ ma:'CITROEN', mo:'C3' }, e2008:{ ma:'PEUGEOT', mo:'2008' },
+  id4_77:{ ma:'VOLKSWAGEN', mo:'ID.4' }, id5_77:{ ma:'VOLKSWAGEN', mo:'ID.5' },
+  enyaq_60:{ ma:'SKODA', mo:'ENYAQ' }, enyaq_80:{ ma:'SKODA', mo:'ENYAQ' },
+  ev6_sr:{ ma:'KIA', mo:'EV6' }, ev6_lr:{ ma:'KIA', mo:'EV6' },
+  q4_40:{ ma:'AUDI', mo:'Q4+E-TRON' }, ix1:{ ma:'BMW', mo:'IX1' }, eqa_250:{ ma:'MERCEDES', mo:'EQA' },
+  autre:null
 };
 
 // ─────────────────────────────────────────────
@@ -1067,7 +1290,13 @@ function scoreKm(km, annee) {
 function buildLcUrl(modeleKey, pMin, pMax) {
   const k = LC_KEYS[modeleKey] || '';
   if (!k) return null;
-  return `https://www.lacentrale.fr/listing?makesModelsCommercialNames=${k}&energy=ELECTRIC&priceMin=${Math.round(pMin)}&priceMax=${Math.round(pMax)}&mileageMax=150000&sortBy=priceAsc`;
+  return `https://www.lacentrale.fr/listing?makesModelsCommercialNames=${k}&energy=ELECTRIC&priceMin=${Math.round(pMin)}&priceMax=${Math.round(pMax)}&mileageMax=150000`;
+}
+
+function buildLargusUrl(modeleKey, pMin, pMax) {
+  const k = LARGUS_KEYS[modeleKey];
+  if (!k) return null;
+  return `https://www.largus.fr/voitures-occasion/annonce-voiture.html?marque=${k.ma}&modele=${k.mo}&energie=Electrique&prix_min=${Math.round(pMin)}&prix_max=${Math.round(pMax)}`;
 }
 
 // ─────────────────────────────────────────────
@@ -1167,14 +1396,14 @@ function analyser() {
       }
     }
 
-    // La Centrale URL
+    // Liens annonces
+    const extIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
     const lcUrl = ref.min ? buildLcUrl(modeleKey, ref.min * 0.9, ref.max * 1.1) : null;
-    const lcBtnHtml = lcUrl ? `
-      <a class="btn-lc" href="${lcUrl}" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Voir sur La Centrale
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>` : '';
+    const largusUrl = ref.min ? buildLargusUrl(modeleKey, ref.min * 0.9, ref.max * 1.1) : null;
+    const lcBtnHtml = (lcUrl || largusUrl) ? `<div class="btn-row">
+      ${lcUrl ? `<a class="btn-lc" href="${lcUrl}" target="_blank" rel="noopener">🔍 La Centrale ${extIcon}</a>` : ''}
+      ${largusUrl ? `<a class="btn-argus" href="${largusUrl}" target="_blank" rel="noopener">🔍 L'Argus ${extIcon}</a>` : ''}
+    </div>` : '';
 
     // Rappels critiques
     const rappelsHtml = def.rappels && def.rappels.length
